@@ -1,53 +1,76 @@
 import React, { useState } from 'react';
-import { collection, addDoc } from 'firebase/firestore'; 
-import db from "../firebase";
+import { collection, addDoc } from 'firebase/firestore';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import db, { storage } from "../firebase"; 
 import '../components/style/Form.css';
 
-
 export default function NewMaterial() {
-    // State of the form fields 
-    
     const [materialDetails, setMaterialDetails] = useState({
         title: "",
         author: "",
-        date_published: "", 
-        description: "", 
-        link: ""
+        date_published: "",
+        description: "",
+        link: "",
     });
+    const [file, setFile] = useState(null); 
+    const [inputKey, setInputKey] = useState(Date.now());
 
-    // Handle form field changes
+  
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setMaterialDetails({
-            ...materialDetails,
-            [name]: value
-        });
+        if (e.target.type === 'file') {
+            setFile(e.target.files[0]); // Set the file
+        } else {
+            const { name, value } = e.target;
+            setMaterialDetails({
+                ...materialDetails,
+                [name]: value
+            });
+        }
     };
 
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // First, upload the file if it exists
+        let fileUrl = '';
+        if (file) {
+            const fileStorageRef = storageRef(storage, `documents/${file.name}`);
+            const uploadResult = await uploadBytes(fileStorageRef, file);
+            fileUrl = await getDownloadURL(uploadResult.ref);
+        }
+
+        // Then, add the document reference to the materialDetails object
+        const finalMaterialDetails = {
+            ...materialDetails,
+            documentUrl: fileUrl, // Include the file URL here
+        };
+
+        // Finally, add the new material details to Firestore
         try {
-            // Add a new document with the data from the form
-            await addDoc(collection(db, "materials"), materialDetails);
+            await addDoc(collection(db, "materials"), finalMaterialDetails);
             console.log("Document successfully written!");
-            // Reset the form 
+
+            // Reset the form and file state
             setMaterialDetails({
                 title: "",
                 author: "",
-                date_published: "", 
-                description: "", 
-                link: ""
+                date_published: "",
+                description: "",
+                link: "",
+                
+                
             });
+            setFile(null);
+            setInputKey(Date.now());
         } catch (error) {
             console.error("Error writing document: ", error);
         }
     };
 
     return (
-
-            <div className="form-container"> 
-                <div className="title"> Add Material to the Database</div>
+        <div className="form-container"> 
+            <div className="title">New Material Page</div>
             <form onSubmit={handleSubmit}>
        <div className="form-titles"> Title</div>
         <input 
@@ -65,7 +88,7 @@ export default function NewMaterial() {
             placeholder="Author"
             value={materialDetails.author}
             onChange={handleChange}
-            className="form-field" // Add class name for styling
+            className="form-field" 
         />
          <div className="form-titles"> Date Published</div>
         <input 
@@ -84,7 +107,7 @@ export default function NewMaterial() {
             onChange={handleChange}
             className="form-field" 
         />
-         <div className="form-titles"> Link</div>
+           <div className="form-titles"> Link</div>
         <input 
             type="text"
             name="link"
@@ -93,13 +116,21 @@ export default function NewMaterial() {
             onChange={handleChange}
             className="form-field" 
         />
-      
-<div className="button-container">
-    <button type="submit" className="submit-button">Submit</button>
+        
+        <div className="form-titles"> File</div>
+                <input 
+                    type="file" 
+                    name="file_upload"
+                    onChange={handleChange} 
+                    className="form-field" 
+                    style={{ justifyContent: 'center' }} 
+                    key={inputKey}
+                />
+                
+                <div className="submit-button-container">
+              <button type="submit" className="submit-button" >Submit</button>
 </div>
-
- 
-    </form>
+            </form>
         </div>
     );
 }
