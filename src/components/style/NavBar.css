@@ -1,0 +1,47 @@
+body {
+    margin: 0; 
+    padding: 0; 
+}
+
+.navBar {
+    background-color: black;
+    
+    overflow: hidden;
+    display: flex; 
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navBar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-align: right; 
+}
+
+.navBar li {
+    display: inline; 
+}
+
+.navBar li a {
+    display: inline-block; 
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    margin-right:10px;
+
+}
+
+
+.navBar li a:hover {
+    color: rgb(198, 198, 236);
+}
+
+.logo {
+    padding-top:10px;
+    padding-bottom:5px;
+    height: 50px; 
+    width: 100px;
+    margin-left: 10px; 
+}
