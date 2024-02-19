@@ -1,7 +1,14 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore"
-import { getStorage } from 'firebase/storage';
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+
+//import { signInWithEmailAndPassword } from "firebase/auth";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -12,17 +19,34 @@ const firebaseConfig = {
   projectId: "sdglibrary-dfc2c",
   storageBucket: "sdglibrary-dfc2c.appspot.com",
   messagingSenderId: "561580139043",
-  appId: "1:561580139043:web:1706a5e6569a65226c0796"
+  appId: "1:561580139043:web:1706a5e6569a65226c0796",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-//export default getFirestore();
 
+// Initialize Auth
+export const auth = getAuth(app);
+
+// Define and export the signup function
+export const dosignup = (email, password) => {
+  return createUserWithEmailAndPassword(auth, email, password);
+};
+
+// log in method
+export const dologin = (email, password) => {
+  return signInWithEmailAndPassword(auth, email, password);
+};
+
+
+export const dologout = () => {
+  return auth.signOut();
+};
 
 // Initialize Firestore
-const db = getFirestore(app);
+export const db = getFirestore(app);
 
+// Initialize Storage
 export const storage = getStorage(app);
 
 export default db;

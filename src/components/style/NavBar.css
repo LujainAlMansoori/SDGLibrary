@@ -4,12 +4,12 @@ body {
 }
 
 .navBar {
-    background-color: black;
+    background-color: #a2cbe7;
     
     overflow: hidden;
     display: flex; 
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .navBar ul {
@@ -25,7 +25,7 @@ body {
 
 .navBar li a {
     display: inline-block; 
-    color: white;
+    color: black;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
@@ -35,7 +35,7 @@ body {
 
 
 .navBar li a:hover {
-    color: rgb(198, 198, 236);
+    color:  blue;
 }
 
 .logo {
@@ -44,4 +44,13 @@ body {
     height: 50px; 
     width: 100px;
     margin-left: 10px; 
+}
+
+.right-nav {
+    float: right;
+  }
+  
+  
+.right-nav {
+  display: flex;
 }
