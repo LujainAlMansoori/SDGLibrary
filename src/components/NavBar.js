@@ -7,7 +7,7 @@ import { useState } from "react";
 
 export default function NavBar() {
   const navigate = useNavigate();
-  const [setError] = useState("");
+  const [error, setError] = useState("");
 
   const { currentUser, logout } = useAuth();
 

@@ -32,7 +32,7 @@ export default function SignUp() {
       setLoading(true);
       await signup(EmailRef.current.value, PasswordRef.current.value);
       // Takes the user to the home page
-      navigate("/");
+      navigate("/createProfile");
       setError("");
     } catch (error) {
       // setError(error.message)

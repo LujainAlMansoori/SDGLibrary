@@ -2,16 +2,19 @@ import { onSnapshot, collection } from "@firebase/firestore";
 import { useEffect, useState } from "react";
 import db from "./firebase";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import NavBar from "./components/NavBar.js";
+import { AuthProvider } from "./contexts/AuthContexts.js";
+
+// Pages imported
 import SearchResults from "./pages/SearchResults.js";
+// Main is the home page
 import Main from "./pages/Main.js";
 import NewMaterial from "./pages/NewMaterial.js";
 import NoPage from "./pages/NoPage.js";
 import Researchers from "./pages/Researchers.js";
 import Signup from "./pages/Signup.js";
 import Login from "./pages/Login.js";
-import NavBar from "./components/NavBar.js";
-import { AuthProvider } from "./contexts/AuthContexts.js";
-
+import CreateProfile from "./pages/createProfile.js";
 
 function App() {
   const [materials, setMaterials] = useState([
@@ -42,6 +45,7 @@ function App() {
             <Route path="/researchers" element={<Researchers />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="login" element={<Login />} />
+            <Route path="/createprofile" element={<CreateProfile />} />
             <Route path="*" element={<NoPage />} />
           </Routes>
         </BrowserRouter>
