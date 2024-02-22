@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 import { useAuth } from "../contexts/AuthContexts";
 import Alert from "@mui/material/Alert";
 import { Link, useNavigate } from "react-router-dom";
+import Paper from "@mui/material/Paper";
 
 export default function SignUp() {
   const EmailRef = useRef(null);
@@ -44,83 +45,102 @@ export default function SignUp() {
   }
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Typography component="h1" variant="h5">
-          Sign up
-        </Typography>
+    <Paper
+      elevation={4}
+      sx={{
+        mt: 7,
+        backgroundColor: "white",
+        width: 700,
+        marginLeft: "23%",
+        height: 500,
+        padding: 2,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Container component="main" maxWidth="xs">
+        <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography component="h1" variant="h5">
+            Sign up
+          </Typography>
 
-        {error && (
-          <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
-            {error}
-          </Alert>
-        )}
+          {error && (
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+              {error}
+            </Alert>
+          )}
 
-        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                inputRef={EmailRef}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="new-password"
-                inputRef={PasswordRef}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                name="confirmpassword"
-                label="Confirm Password"
-                type="password"
-                id="confirmpassword"
-                autoComplete="confirm-password"
-                inputRef={ConfirmPasswordRef}
-              />
-            </Grid>
-          </Grid>
-          <Button
-            disabled={loading}
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleSubmit}
+            sx={{ mt: 3 }}
           >
-            Sign Up
-          </Button>
-
-          <Grid container justifyContent="flex-end">
-            <Grid item>
-              Have An Account?{" "}
-              <Link to="/login" variant="body2" style={{ color: "blue" }}>
-                Log In
-              </Link>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  inputRef={EmailRef}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                  inputRef={PasswordRef}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="confirmpassword"
+                  label="Confirm Password"
+                  type="password"
+                  id="confirmpassword"
+                  autoComplete="confirm-password"
+                  inputRef={ConfirmPasswordRef}
+                />
+              </Grid>
             </Grid>
-          </Grid>
+            <Button
+              disabled={loading}
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign Up
+            </Button>
+
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                Have An Account?{" "}
+                <Link to="/login" variant="body2" style={{ color: "blue" }}>
+                  Log In
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Paper>
   );
 }
