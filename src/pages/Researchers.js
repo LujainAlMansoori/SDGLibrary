@@ -8,8 +8,11 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import "../components/style/noHover.css";
 import emailjs from "emailjs-com";
 import { useAuth } from "../contexts/AuthContexts";
-
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import { doc, getDoc } from "firebase/firestore";
+import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
 
 // sending others emails
 const sendEmail = (e) => {
@@ -82,13 +85,8 @@ const ProfilePopup = ({ profile, onClose }) => {
 
   // Do not render the popup until both profiles are loaded
   if (!profile || !profileofCurrentUser) {
-    console.log("Waiting for profiles to be loaded..."); // Debug log
     return null;
   }
-
-  console.log("Sending email from:", profileofCurrentUser.email); // Debug log
-  console.log("Sending email to:", profile.email); // Debug log
-
   return (
     <div
       className="popup-container"
@@ -130,17 +128,63 @@ const ProfilePopup = ({ profile, onClose }) => {
       {/* Popup content  */}
 
       <div>
-        <h2>Sender Email: {profileofCurrentUser?.email}</h2>
-        <h2>Receiver Email: {profile?.email}</h2>
+        <Typography
+          type="submit"
+          component="h1"
+          variant="h4"
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontFamily: "Times New Roman",
+            paddingTop: "50px",
+            margin: "auto",
+            width: "100%",
+            mt: 3,
+            mb: 2,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginTop: "40px",
+              }}
+            >
+              <img
+                src={profile.profileImage}
+                alt={`${profile.firstName} ${profile.lastName}`}
+                style={{
+                  width: "100px", // Adjust the size as needed
+                  height: "100px",
+                  borderRadius: "50%", // Make the image round
+                  marginRight: "40px", // Add some space between the image and the text
+                }}
+              />
+              <Typography
+                component="h1"
+                variant="h4"
+                sx={{
+                  fontFamily: "Times New Roman",
+                }}
+              >
+                Contact{" "}
+                {`${profile.title} ${profile.firstName} ${profile.lastName}`}
+              </Typography>
+            </div>
+          </div>
+        </Typography>
 
-        <h1>
-          Contact {`${profile.title} ${profile.firstName} ${profile.lastName}`}
-        </h1>
         {/* Popup content */}
         <div>
-          Contact {`${profile.title} ${profile.firstName} ${profile.lastName}`}
           <form onSubmit={sendEmail}>
-            {/* Hidden inputs for sender's and receiver's names */}
             <input
               type="hidden"
               name="from_name"
@@ -151,12 +195,28 @@ const ProfilePopup = ({ profile, onClose }) => {
               name="to_name"
               value={`${profile.title} ${profile.firstName} ${profile.lastName}`}
             />
-            {/* Textarea for the email message */}
-            <textarea
-              name="message"
-              placeholder="Your message here..."
-            ></textarea>
-            {/* Hidden inputs for sender's and receiver's emails */}
+
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                multiline
+                rows={12}
+                name="message"
+                label="Your Message"
+                sx={{
+                  maxWidth: "70%",
+                  marginLeft: "150px",
+
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                }}
+              />
+            </Grid>
+
             <input
               type="hidden"
               name="from_email"
@@ -164,7 +224,21 @@ const ProfilePopup = ({ profile, onClose }) => {
             />
             <input type="hidden" name="to_email" value={profile.email} />
 
-            <button type="submit">Send Email</button>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                mt: 5,
+                mb: 2,
+                width: 400,
+                fontFamily: "Times New Roman",
+                display: "block",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              Send Email
+            </Button>
           </form>
         </div>
       </div>
@@ -255,7 +329,7 @@ export default function Researchers() {
               fontFamily: "Times New Roman",
               color: "black",
               fontSize: "16px",
-              marginTop: "-20px" /* Adjust this value as needed to align */,
+              marginTop: "-20px",
             }}
           >
             Contact{" "}
