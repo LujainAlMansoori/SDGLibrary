@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContexts";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase"; // Adjust the path as necessary
 import "../components/style/Main.css";
+import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
 
 export default function Main() {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+  const handleSearchResultsClick = () => {
+    navigate("/searchresults");
+  };
+  const handleResearchersClick = () => {
+    if (currentUser) {
+      navigate("/researchers");
+    } else {
+      navigate("/signup");
+    }
+  };
   return (
     <div className="main-container">
       <div className="content">
-        <h1>Welcome to the SDGLibrary</h1>
+        <h1 style={{ color: "#17386E" }}>Welcome to the SDGLibrary</h1>
         <div className="sdg-shop-section">
           <h2>A One-Stop SDG Shop, Access Resources and Researchers</h2>
         </div>
@@ -42,19 +55,48 @@ export default function Main() {
             The SDGLibrary aims to provide an accessible centralized platform
             for all SDGED and GCED resources and connect researchers.
           </p>
-          <p>
-            With the SDGLibrary, you can:
-            <ol>
-              <li>
-                Search through our SDG database for the material of your choice.
-              </li>
-              <li>
-                Connecting with our SDG researchers by joining the SDG
-                community.
-              </li>
-            </ol>
-          </p>
         </div>
+      </div>
+
+      <div className="buttons-content-searching">
+        <div className="buttons-heading">
+          <h2 style={{ color: "#17386E" }}>Search</h2>
+        </div>
+        <p>
+          Search through our SDG database for the material of your choice. You
+          can search by SDG or keyword and filter according to your preferred
+          categories.
+        </p>
+
+        <Button
+          variant="contained"
+          sx={{
+            width: 400,
+          }}
+          onClick={handleSearchResultsClick}
+        >
+          Search the SDGLibrary
+        </Button>
+      </div>
+
+      <div className="buttons-content-researchers">
+        <div className="buttons-heading">
+          <h2 style={{ color: "#17386E" }}>Connect</h2>
+        </div>
+        <p style={{ marginBottom: "33px" }}>
+          Once you create an account, you can search, network and connect with
+          our SDG researchers.
+        </p>
+
+        <Button
+          variant="contained"
+          sx={{
+            width: 400,
+          }}
+          onClick={handleResearchersClick}
+        >
+          Connect with Researchers
+        </Button>
       </div>
     </div>
   );

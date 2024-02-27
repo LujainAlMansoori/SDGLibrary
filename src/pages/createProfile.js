@@ -19,14 +19,14 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 
-import { uploadBytes, getDownloadURL, getStorage, ref as storageRef } from "firebase/storage";
-
 import {
- 
-  ref,
-  uploadBytesResumable,
-  
-} from "../firebase";
+  uploadBytes,
+  getDownloadURL,
+  getStorage,
+  ref as storageRef,
+} from "firebase/storage";
+
+import { ref, uploadBytesResumable } from "../firebase";
 
 // getting user input and sending it to the DB
 import { db } from "../firebase"; // Adjust the path as necessary
@@ -125,7 +125,7 @@ export default function CreateProfile() {
       setLoading(true);
       // Set the document in the 'profiles' collection with the user's UID as the document ID
       await setDoc(doc(db, "profiles", currentUser.uid), userProfile);
-      navigate("/");
+      navigate("/researchers");
       console.log("Profile created successfully");
     } catch (error) {
       console.error("Error creating profile:", error);
