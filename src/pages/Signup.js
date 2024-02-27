@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { app } from "../firebase.js";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
@@ -35,6 +35,9 @@ export default function SignUp() {
         // User's profile exists, navigate to home page
         navigate("/");
       } else {
+        // await setDoc(userProfileRef, {
+        //   email: user.email, // Save the email from the authenticated user object
+        // }, { merge: true });
         // No profile found, navigate to profile creation page
         navigate("/createProfile");
       }

@@ -1,0 +1,8 @@
+.noHoverEffect {
+    color: black !important; /* Ensure the color is black */
+  }
+  
+  .noHoverEffect:hover {
+    background-color: transparent !important; /* Prevents grey background on hover */
+  }
+  

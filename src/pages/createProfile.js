@@ -116,6 +116,7 @@ export default function CreateProfile() {
       currentProjects: event.target.currentProjects.value,
       researchInterests: selectedSDGs,
       profileImage: profileImageUrl,
+      email: currentUser.email,
     };
 
     try {
