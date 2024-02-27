@@ -188,7 +188,8 @@ const ProfilePopup = ({ profile, onClose }) => {
             <input
               type="hidden"
               name="from_name"
-              value={`${currentUser?.displayName}`}
+              value={`${profileofCurrentUser?.title} ${profileofCurrentUser?.firstName} ${profileofCurrentUser?.lastName}`}
+              
             />
             <input
               type="hidden"
