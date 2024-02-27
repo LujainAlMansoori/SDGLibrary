@@ -1,48 +1,50 @@
-import * as React from "react";
+import React, { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
+import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { app } from "../firebase.js";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { useRef, useState } from "react";
-import { useAuth } from "../contexts/AuthContexts";
 import Alert from "@mui/material/Alert";
 import { Link, useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 
 export default function SignUp() {
-  const EmailRef = useRef(null);
-  const PasswordRef = useRef(null);
-  const ConfirmPasswordRef = useRef(null);
-  const { signup } = useAuth();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  const auth = getAuth(app); // Use the Firebase app instance
+  const db = getFirestore(app); // Initialize Firestore using your Firebase app
 
-    // Validation checks
-    if (PasswordRef.current.value !== ConfirmPasswordRef.current.value) {
-      return setError("Passwords Do Not Match.");
-    }
+  const handleGoogleSignUp = async () => {
+    setLoading(true);
+
     try {
-      // Function awaits the sign up
-      setError("");
-      setLoading(true);
-      await signup(EmailRef.current.value, PasswordRef.current.value);
-      // Takes the user to the home page
-      navigate("/createProfile");
-      setError("");
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if user's profile exists in Firestore in the 'profiles' collection
+      const userProfileRef = doc(db, "profiles", user.uid);
+      const userProfileSnap = await getDoc(userProfileRef);
+
+      if (userProfileSnap.exists()) {
+        // User's profile exists, navigate to home page
+        navigate("/");
+      } else {
+        // No profile found, navigate to profile creation page
+        navigate("/createProfile");
+      }
     } catch (error) {
-      // setError(error.message)
-      console.error(error);
-      setError("Failed to Create an Account.");
+      console.error("Failed to sign in with Google:", error);
+      setError("Failed to sign in with Google: " + error.message);
+    } finally {
+      setLoading(false);
     }
-    // to prevent user from pressing sign up multiple times
-    setLoading(false);
-  }
+  };
 
   return (
     <Paper
@@ -52,7 +54,7 @@ export default function SignUp() {
         backgroundColor: "white",
         width: 700,
         marginLeft: "23%",
-        height: 500,
+        height: "auto",
         padding: 2,
         justifyContent: "center",
         alignItems: "center",
@@ -68,77 +70,42 @@ export default function SignUp() {
           }}
         >
           <Typography component="h1" variant="h5">
-            Sign up
+            Sign In
           </Typography>
-
           {error && (
             <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
               {error}
             </Alert>
           )}
-
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 3 }}
+          <Button
+            disabled={loading}
+            onClick={handleGoogleSignUp}
+            fullWidth
+            variant="contained"
+            sx={{
+              mt: 3,
+              mb: 2,
+              position: "relative", 
+            }}
+            startIcon={
+              <span
+                style={{
+                  display: "inline-flex", 
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "50%", 
+                  backgroundColor: "white", 
+                  width: "30px",
+                  height: "30px",
+                  marginRight: "8px", 
+                }}
+              >
+                <FcGoogle size={22} style={{ zIndex: 1 }} />
+              </span>
+            }
           >
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  inputRef={EmailRef}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                  inputRef={PasswordRef}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="confirmpassword"
-                  label="Confirm Password"
-                  type="password"
-                  id="confirmpassword"
-                  autoComplete="confirm-password"
-                  inputRef={ConfirmPasswordRef}
-                />
-              </Grid>
-            </Grid>
-            <Button
-              disabled={loading}
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign Up
-            </Button>
-
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                Have An Account?{" "}
-                <Link to="/login" variant="body2" style={{ color: "blue" }}>
-                  Log In
-                </Link>
-              </Grid>
-            </Grid>
-          </Box>
+            Sign In with Google
+          </Button>
         </Box>
       </Container>
     </Paper>

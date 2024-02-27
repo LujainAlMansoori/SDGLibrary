@@ -15,7 +15,7 @@ export default function NavBar() {
     try {
       setError("");
       await logout();
-      navigate("/login");
+      navigate("/signup");
     } catch (error) {
       console.error(error);
       setError("Failed to Log Out.");
@@ -87,7 +87,7 @@ export default function NavBar() {
             </button>
           ) : (
             <li style={{ marginRight: "10px" }}>
-              <Link to="/Signup">Sign Up</Link>
+              <Link to="/Signup">Sign In</Link>
             </li>
           )}
         </div>

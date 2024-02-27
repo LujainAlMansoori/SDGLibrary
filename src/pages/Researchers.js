@@ -1,11 +1,53 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../firebase"; // make sure this import points to your firebase config file
+import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import Paper from "@mui/material/Paper";
 import "../components/style/titles.css";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined"; // Import the outlined email icon
+
+import EmailIcon from "@mui/icons-material/Email";
+
+// Popup component for sending emails
+const ProfilePopup = ({ profile, onClose }) => {
+  if (!profile) return null; // render nothing if no profile
+
+  return (
+    <div
+      className="popup-container"
+      style={{
+        position: "fixed",
+        top: 69,
+        right: 0,
+        bottom: 0,
+        width: "75%",
+        backgroundColor: "white",
+        zIndex: 1000,
+        overflowY: "auto",
+      }}
+    >
+      <button
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+          cursor: "pointer",
+        }}
+      >
+        X
+      </button>
+      {/* Popup content  */}
+      <div>
+        <h1>{`${profile.title} ${profile.firstName} ${profile.lastName}`}</h1>
+        {/* Include other profile details */}
+      </div>
+    </div>
+  );
+};
 
 export default function Researchers() {
   const [profiles, setProfiles] = useState([]);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -17,6 +59,22 @@ export default function Researchers() {
 
     fetchProfiles();
   }, []);
+
+  // This sets the state of the popup
+  const handleProfileClick = (profile) => {
+    setSelectedProfile(profile);
+  };
+
+  //This closes the pop up
+  const handleClosePopup = () => {
+    setSelectedProfile(null);
+  };
+
+  // Prevents click event from propagating to the parent
+  const handleContactClick = (event, profile) => {
+    event.stopPropagation();
+    setSelectedProfile(profile);
+  };
 
   return (
     <div>
@@ -32,26 +90,46 @@ export default function Researchers() {
             margin: "10px 10px",
             display: "flex",
             alignItems: "center",
+            justifyContent: "space-between",
             width: 1400,
             height: 100,
           }}
+          onClick={() => handleProfileClick(profile)}
         >
-          <img
-            src={profile.profileImage}
-            alt={`${profile.firstName} ${profile.lastName}`}
-            style={{
-              borderRadius: "50%",
-              marginRight: "40px",
-              marginLeft: "40px",
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={profile.profileImage}
+              alt={`${profile.firstName} ${profile.lastName}`}
+              style={{
+                borderRadius: "50%",
+                marginRight: "40px",
+                marginLeft: "40px",
+                width: "80px",
+                height: "80px",
+              }}
+            />
+            <div style={{ fontFamily: "Times New Roman", color: "black" }}>
+              <div>{`${profile.title} ${profile.firstName} ${profile.lastName}`}</div>
+              <br />
+              <div>{profile.role}</div>
+            </div>
+          </div>
+          <div
 
-              width: "80px",
-              height: "80px",
+            onClick={(event) => handleContactClick(event, profile)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              marginRight: "20px",
+              fontFamily: "Times New Roman",
+              color: "black",
+              fontSize: "16px",
+              marginTop: "-20px" /* Adjust this value as needed to align */,
             }}
-          />
-          <div>
-            <div>{`${profile.title} ${profile.firstName} ${profile.lastName}`}</div>
-            <br></br>
-            <div>{profile.role}</div>
+          >
+            Contact 
+            <EmailOutlinedIcon style={{ color: "black", marginLeft: "5px" }} />
           </div>
         </Paper>
       ))}

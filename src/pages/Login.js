@@ -37,7 +37,7 @@ export default function Login() {
       navigate("/");
     } catch (error) {
       // setError(error.message)
-      console.error(error);
+      console.error(error.message);
       setError("Failed to Log In.");
     }
     // to prevent user from pressing sign up multiple times

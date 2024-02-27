@@ -4,6 +4,8 @@ import db from "./firebase";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar.js";
 import { AuthProvider } from "./contexts/AuthContexts.js";
+import { GoogleAuthProvider } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 // Pages imported
 import SearchResults from "./pages/SearchResults.js";
@@ -15,8 +17,12 @@ import Researchers from "./pages/Researchers.js";
 import Signup from "./pages/Signup.js";
 import Login from "./pages/Login.js";
 import CreateProfile from "./pages/createProfile.js";
+import {app} from "./firebase"
 
 function App() {
+  const provider = new GoogleAuthProvider();
+  const auth = getAuth(app);
+
   const [materials, setMaterials] = useState([
     { name: "Loading...", id: "initial" },
   ]);
