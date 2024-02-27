@@ -1,0 +1,77 @@
+.main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align children to the top */
+    align-items: center; /* Center horizontally */
+ 
+    background-image: url('../assets/SDGMain.jpg');
+    background-repeat: repeat-y;
+    background-size: cover;
+    height: 200vh;
+    width: 100%;
+    background-position: center 20px;
+    background-size: 100% auto;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  .main-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+ 
+    background: rgba(242, 227, 227, 0.299); /* Adjust the opacity as needed */
+    z-index: 0;
+  }
+  
+  .main-container > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .sdg-shop-section {
+    text-align:center;
+  
+   
+   
+  }
+
+  .who-are-we{
+    padding-top: 15px;
+  }
+  
+  
+  .sdg-library-description{
+    padding-top: 15px;
+  }
+  
+
+  .content {
+    
+    margin-top: 80px;
+    color: black;
+    font-family: 'Times New Roman', serif;
+    padding: 20px;
+    max-width: 60%;
+    background-color: rgba(255, 255, 255, 0.912);
+    border-radius: 10px;
+ 
+  }
+  
+  h1 {  
+    text-align: center;
+    font-size: 3em;
+  }
+  
+  h2 {
+    font-size: 1.5em;
+  }
+  
+  p {
+  
+    margin-top: -10px;
+  }
+  
