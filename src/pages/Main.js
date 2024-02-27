@@ -43,7 +43,7 @@ export default function Main() {
             for all SDGED and GCED resources and connect researchers.
           </p>
           <p>
-           With the SDGLibrary, you can:
+            With the SDGLibrary, you can:
             <ol>
               <li>
                 Search through our SDG database for the material of your choice.
