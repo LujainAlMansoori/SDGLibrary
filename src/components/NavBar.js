@@ -1,15 +1,35 @@
-import "./style/NavBar.css";
-import logo from "./assets/logo.png";
-import { useAuth } from "../contexts/AuthContexts";
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { useAuth } from "../contexts/AuthContexts";
+import logo from "./assets/logo.png";
+import { db } from "../firebase";
+import "./style/NavBar.css";
+import MenuListComposition from "./menuListComponent.js"; // Import the MenuListComposition component
 
 export default function NavBar() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
   const { currentUser, logout } = useAuth();
+
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (currentUser?.uid) {
+        const docRef = doc(db, "profiles", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setUserProfile(docSnap.data());
+        } else {
+          console.log("No such document!");
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [currentUser]);
 
   const handleLogout = async () => {
     try {
@@ -64,27 +84,26 @@ export default function NavBar() {
             </li>
           </ul>
         </div>
-        <div>
-          {/* Show log in or log out depending on if the user is logged in or not*/}
-          {currentUser ? (
-            <button
-              onClick={handleLogout}
-              style={{
-                marginRight: "13px",
-                display: "inline-block",
-                color: "black",
-                textAlign: "center",
-                padding: "14px 16px",
-                textDecoration: "none",
-                fontSize: "16px",
-                fontFamily: "Times New Roman, Times, serif",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Log Out
-            </button>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {currentUser && userProfile ? (
+            <>
+              <img
+                src={userProfile.profileImage || "default-avatar.png"}
+                alt="Profile"
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  marginRight: "10px",
+                }}
+              />
+              <span style={{ marginRight: "10px" }}>
+                {userProfile.title} {userProfile.firstName}{" "}
+                {userProfile.lastName}
+              </span>
+              <MenuListComposition logout={logout} navigate={navigate} /> {/* Pass logout and navigate as props */}
+              {/* Use the MenuListComposition component */}
+            </>
           ) : (
             <li style={{ marginRight: "10px" }}>
               <Link to="/Signup">Sign In</Link>
