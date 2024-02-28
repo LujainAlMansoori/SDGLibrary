@@ -63,6 +63,44 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
   if (!profile || !profileofCurrentUser) {
     return null;
   }
+
+  const getSDGImagePath = (sdgNumber) => {
+    const imagePath = `./SDG/SDG${sdgNumber}.png`;
+    console.log(`Generated image path: ${imagePath}`); // This will print the path for each SDG image
+    return imagePath;
+  };
+
+  // Component to render SDG images
+  const SDGImages = ({ researchInterests }) => {
+    const sortedInterests = researchInterests
+      .map((interest) => ({
+        interest,
+        number: parseInt(interest.match(/SDG(\d+)/)[1], 10), // Extracts and parses the number
+      }))
+      .sort((a, b) => a.number - b.number) // Sort by the SDG number
+      .map((item) => item.interest); // Map back to the original interest string
+    return (
+      <div style={{ display: "flex", flexWrap: "wrap" }}>
+        {sortedInterests.map((interest, index) => {
+          const sdgNumber = interest.match(/SDG(\d+)/)[1]; // Extracts the number from the string
+          return (
+            <img
+              key={index}
+              src={getSDGImagePath(sdgNumber)}
+              alt={`SDG ${sdgNumber}`}
+              style={{
+                width: "100px",
+                height: "100px",
+                marginRight: "5px", // Add space between images
+                marginBottom: "5px", // Wrap to the next line for every 5 images
+              }}
+            />
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div
       className="popup-container"
@@ -175,6 +213,24 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
           Current Projects: <b></b>
         </strong>
         <div>{profile.currentProjects}</div>
+      </Typography>
+
+      <Typography
+        sx={{
+          fontFamily: "Times New Roman",
+          textAlign: "left",
+          marginLeft: "120px",
+          maxWidth: "80%",
+          marginBottom: "20px",
+        }}
+      >
+        <strong>
+          SDG Interests: <b></b>
+        </strong>
+        <div>
+          {" "}
+          <SDGImages researchInterests={profile.researchInterests} />
+        </div>
       </Typography>
     </div>
   );
