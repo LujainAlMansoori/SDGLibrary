@@ -35,6 +35,151 @@ const sendEmail = (e) => {
     );
 };
 
+const ProfileInfoPopup = ({ profile, onClose }) => {
+  const { currentUser } = useAuth();
+  const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);
+
+  useEffect(() => {
+    async function fetchProfileofCurrentUser() {
+      if (currentUser) {
+        const profileDoc = await getDoc(doc(db, "profiles", currentUser.uid));
+        if (profileDoc.exists()) {
+          const data = profileDoc.data();
+          console.log("Current user profile data:", data);
+          setProfileofCurrentUser(data);
+        } else {
+          console.log("No such profile for current user!");
+        }
+      }
+    }
+
+    fetchProfileofCurrentUser();
+  }, [currentUser]);
+
+  // Do not render the popup until the profile is loaded
+  if (!profile) return null;
+
+  // Do not render the popup until both profiles are loaded
+  if (!profile || !profileofCurrentUser) {
+    return null;
+  }
+  return (
+    <div
+      className="popup-container"
+      style={{
+        position: "fixed",
+        top: 69,
+        right: 0,
+        bottom: 0,
+        width: "75%",
+        backgroundColor: "white",
+        zIndex: 1000,
+        overflowY: "auto",
+        border: "1px solid #e0e0e0",
+        boxShadow:
+          "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)", // Example shadow, similar to Material-UI Paper elevation=3
+      }}
+    >
+      <button
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+          cursor: "pointer",
+          width: "20px",
+          height: "20px",
+          borderRadius: "50%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          border: "none",
+          backgroundColor: "#f0f0f0",
+          color: "black",
+          fontSize: "10px",
+        }}
+      >
+        X
+      </button>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{ display: "flex", alignItems: "center", marginTop: "90px" }}
+        >
+          <img
+            src={profile.profileImage}
+            alt={`${profile.firstName} ${profile.lastName}`}
+            style={{
+              width: "125px",
+              height: "125px",
+              borderRadius: "50%",
+
+              marginRight: "40px",
+            }}
+          />
+          <div>
+            <Typography
+              component="h1"
+              variant="h4"
+              sx={{
+                fontFamily: "Times New Roman",
+              }}
+            >
+              {`${profile.title} ${profile.firstName} ${profile.lastName}`}
+            </Typography>
+            <Typography
+              component="h1"
+              variant="h5"
+              sx={{
+                fontFamily: "Times New Roman",
+                marginBottom: "20px",
+              }}
+            >
+              {profile.role}
+            </Typography>
+          </div>
+        </div>
+      </div>
+
+      <Typography
+        sx={{
+          fontFamily: "Times New Roman",
+          marginTop: "40px",
+          marginBottom: "20px",
+          marginLeft: "120px",
+          textAlign: "left",
+          maxWidth: "80%",
+        }}
+      >
+        <strong>
+          Biography: <b></b>
+        </strong>
+        <div>{profile.biography}</div>
+      </Typography>
+      <Typography
+        sx={{
+          fontFamily: "Times New Roman",
+          textAlign: "left",
+          marginLeft: "120px",
+          maxWidth: "80%",
+          marginBottom: "20px",
+        }}
+      >
+        <strong>
+          Current Projects: <b></b>
+        </strong>
+        <div>{profile.currentProjects}</div>
+      </Typography>
+    </div>
+  );
+};
+
 // Popup component for sending emails
 const ProfilePopup = ({ profile, onClose }) => {
   const { currentUser } = useAuth();
@@ -101,7 +246,7 @@ const ProfilePopup = ({ profile, onClose }) => {
         overflowY: "auto",
         border: "1px solid #e0e0e0",
         boxShadow:
-          "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)", // Example shadow, similar to Material-UI Paper elevation=3
+          "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
       }}
     >
       <button
@@ -162,10 +307,10 @@ const ProfilePopup = ({ profile, onClose }) => {
                 src={profile.profileImage}
                 alt={`${profile.firstName} ${profile.lastName}`}
                 style={{
-                  width: "100px", // Adjust the size as needed
+                  width: "100px",
                   height: "100px",
-                  borderRadius: "50%", // Make the image round
-                  marginRight: "40px", // Add some space between the image and the text
+                  borderRadius: "50%",
+                  marginRight: "40px",
                 }}
               />
               <Typography
@@ -189,7 +334,6 @@ const ProfilePopup = ({ profile, onClose }) => {
               type="hidden"
               name="from_name"
               value={`${profileofCurrentUser?.title} ${profileofCurrentUser?.firstName} ${profileofCurrentUser?.lastName}`}
-              
             />
             <input
               type="hidden"
@@ -250,6 +394,7 @@ const ProfilePopup = ({ profile, onClose }) => {
 export default function Researchers() {
   const [profiles, setProfiles] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [contactProfile, setContactProfile] = useState(null);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -265,20 +410,20 @@ export default function Researchers() {
     fetchProfiles();
   }, []);
 
-  // This sets the state of the popup
   const handleProfileClick = (profile) => {
     setSelectedProfile(profile);
+    setContactProfile(null); // Close the contact popup if it's open
   };
 
-  //This closes the pop up
   const handleClosePopup = () => {
     setSelectedProfile(null);
+    setContactProfile(null);
   };
 
-  // Prevents click event from propagating to the parent
   const handleContactClick = (event, profile) => {
     event.stopPropagation();
-    setSelectedProfile(profile);
+    setContactProfile(profile);
+    setSelectedProfile(null); // Close the profile info popup if it's open
   };
 
   return (
@@ -295,7 +440,7 @@ export default function Researchers() {
             margin: "10px 10px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between", // Adjust this to space-between to align items properly
+            justifyContent: "space-between",
             width: 1400,
             height: 100,
           }}
@@ -314,9 +459,11 @@ export default function Researchers() {
               }}
             />
             <div>
-              <div>{`${profile.title} ${profile.firstName} ${profile.lastName}`}</div>
-              <br />
-              <div>{profile.role}</div>
+              <div style={{ cursor: "pointer" }}>
+                <div>{`${profile.title} ${profile.firstName} ${profile.lastName}`}</div>
+                <br />
+                <div>{profile.role}</div>
+              </div>
             </div>
           </div>
           <IconButton
@@ -339,7 +486,13 @@ export default function Researchers() {
         </Paper>
       ))}
       {selectedProfile && (
-        <ProfilePopup profile={selectedProfile} onClose={handleClosePopup} />
+        <ProfileInfoPopup
+          profile={selectedProfile}
+          onClose={handleClosePopup}
+        />
+      )}
+      {contactProfile && (
+        <ProfilePopup profile={contactProfile} onClose={handleClosePopup} />
       )}
     </div>
   );

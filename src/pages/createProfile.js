@@ -210,7 +210,7 @@ export default function CreateProfile() {
                       >
                         <MenuItem value={"Ms."}>Ms.</MenuItem>
                         <MenuItem value={"Mr."}>Mr.</MenuItem>
-                        <MenuItem value={"Dr"}>Dr.</MenuItem>
+                        <MenuItem value={"Dr."}>Dr.</MenuItem>
                         <MenuItem value={"Prof."}>Prof.</MenuItem>
                       </Select>
                     </FormControl>
