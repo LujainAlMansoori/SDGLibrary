@@ -14,26 +14,43 @@ import { doc, getDoc } from "firebase/firestore";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 
-// sending others emails
-const sendEmail = (e) => {
-  e.preventDefault();
+const remainingEmailsMessage = (emailCount, maxEmails) => {
+  if (emailCount < maxEmails) {
+    return `You have ${maxEmails - emailCount} email(s) left.`;
+  }
 
-  emailjs
-    .sendForm(
-      "service_dnc473a",
-      "template_1w5ueo3",
-      e.target,
-      "N1abVoGcbh8XG1Gp7"
-    )
-    .then(
-      (result) => {
-        console.log(result.text); // Handle the success response here
-      },
-      (error) => {
-        console.log(error.text); // Handle the error response here
-      }
-    );
+  return "You cannot contact them anymore, you have already sent three emails.";
 };
+// sending others emails
+// const sendEmail = (e) => {
+//   e.preventDefault();
+
+// First check if the user can send them messages
+//   if (emailCount >= maxEmails) {
+//     alert(
+//       "You cannot contact them anymore, you have already sent three emails."
+//     );
+//     return;
+//   }
+
+//   emailjs
+//     .sendForm(
+//       "service_dnc473a",
+//       "template_1w5ueo3",
+//       e.target,
+//       "N1abVoGcbh8XG1Gp7"
+//     )
+//     .then(
+//       (result) => {
+//         console.log(result.text); // Handle the success response here
+//         e.target.reset();
+//         setEmailCount(emailCount + 1);
+//       },
+//       (error) => {
+//         console.log(error.text); // Handle the error response here
+//       }
+//     );
+// };
 
 const ProfileInfoPopup = ({ profile, onClose }) => {
   const { currentUser } = useAuth();
@@ -240,7 +257,15 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
 };
 
 // Popup component for sending emails
-const ProfilePopup = ({ profile, onClose }) => {
+const ProfilePopup = ({
+  profile,
+  onClose,
+  emailCount,
+  setEmailCount,
+  maxEmails,
+}) => {
+  //State variables to keep track of the amount of emails sent to another user
+
   const { currentUser } = useAuth();
   const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);
   const senderEmail = profileofCurrentUser?.email; // Email of the current logged-in user
@@ -267,6 +292,12 @@ const ProfilePopup = ({ profile, onClose }) => {
   const sendEmail = (e) => {
     e.preventDefault();
 
+    if (emailCount >= maxEmails) {
+      alert(
+        "You cannot contact them anymore, you have already sent three emails."
+      );
+      return;
+    }
     console.log("Sender Email:", profileofCurrentUser?.email); // Print sender email
     console.log("Receiver Email:", profile?.email); // Print receiver email
 
@@ -280,6 +311,8 @@ const ProfilePopup = ({ profile, onClose }) => {
       .then(
         (result) => {
           console.log("Email sent result:", result.text); // This will print the result of sending the email
+          e.target.reset();
+          setEmailCount(emailCount + 1);
         },
         (error) => {
           console.log("Send email error:", error.text); // This will print the error if email sending fails
@@ -389,6 +422,20 @@ const ProfilePopup = ({ profile, onClose }) => {
             </div>
           </div>
         </Typography>
+        {emailCount < maxEmails && (
+          <Typography
+            sx={{
+              fontFamily: "Times New Roman",
+              marginTop: "20px",
+              textAlign: "left",
+              marginLeft: "150px",
+              marginBottom: "5px",
+              maxWidth: "80%",
+            }}
+          >
+            {remainingEmailsMessage(emailCount, maxEmails)}
+          </Typography>
+        )}
 
         {/* Popup content */}
         <div>
@@ -435,6 +482,7 @@ const ProfilePopup = ({ profile, onClose }) => {
             <Button
               type="submit"
               variant="contained"
+              disabled={emailCount >= maxEmails}
               sx={{
                 mt: 5,
                 mb: 2,
@@ -458,6 +506,10 @@ export default function Researchers() {
   const [profiles, setProfiles] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [contactProfile, setContactProfile] = useState(null);
+  // keep track of the emails sent to avoid spam
+  const [emailCount, setEmailCount] = useState(0);
+  const [emailCounts, setEmailCounts] = useState({});
+  const maxEmails = 3;
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -487,6 +539,13 @@ export default function Researchers() {
     event.stopPropagation();
     setContactProfile(profile);
     setSelectedProfile(null); // Close the profile info popup if it's open
+    if (!emailCount[profile.id]) {
+      setEmailCount({ ...emailCount, [profile.id]: 0 });
+    }
+    // setEmailCounts((prevCounts) => ({
+    //   ...prevCounts,
+    //   [profile.id]: prevCounts[profile.id] || 0,
+    // }));
   };
 
   return (
@@ -558,7 +617,15 @@ export default function Researchers() {
         />
       )}
       {contactProfile && (
-        <ProfilePopup profile={contactProfile} onClose={handleClosePopup} />
+        <ProfilePopup
+          profile={contactProfile}
+          onClose={handleClosePopup}
+          emailCount={emailCounts[contactProfile.id] || 0}
+          setEmailCount={(count) =>
+            setEmailCounts({ ...emailCounts, [contactProfile.id]: count })
+          }
+          maxEmails={maxEmails}
+        />
       )}
     </div>
   );
