@@ -151,8 +151,11 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
           style={{ display: "flex", alignItems: "center", marginTop: "90px" }}
         >
           <img
-            src={profile.profileImage}
-            alt={`${profile.firstName} ${profile.lastName}`}
+            src={
+              profile.profileImage ||
+              require("../components/assets/profile-photo.webp")
+            }
+            // alt={`${profile.firstName} ${profile.lastName}`}
             style={{
               width: "125px",
               height: "125px",
@@ -360,8 +363,12 @@ const ProfilePopup = ({ profile, onClose }) => {
               }}
             >
               <img
-                src={profile.profileImage}
-                alt={`${profile.firstName} ${profile.lastName}`}
+                src={
+                  profile.profileImage ||
+                  require("../components/assets/profile-photo.webp")
+                }
+                // alt={`${profile.firstName} ${profile.lastName}`}
+
                 style={{
                   width: "100px",
                   height: "100px",
@@ -504,8 +511,11 @@ export default function Researchers() {
         >
           <div style={{ display: "flex", alignItems: "center" }}>
             <img
-              src={profile.profileImage}
-              alt={`${profile.firstName} ${profile.lastName}`}
+              src={
+                profile.profileImage ||
+                require("../components/assets/profile-photo.webp")
+              }
+              // alt={`${profile.firstName} ${profile.lastName}`}
               style={{
                 borderRadius: "50%",
                 marginRight: "40px",

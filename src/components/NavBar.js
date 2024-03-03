@@ -88,7 +88,7 @@ export default function NavBar() {
           {currentUser && userProfile ? (
             <>
               <img
-                src={userProfile.profileImage || "default-avatar.png"}
+                src={userProfile.profileImage || require("../components/assets/profile-photo.webp")}
                 alt="Profile"
                 style={{
                   width: "40px",
