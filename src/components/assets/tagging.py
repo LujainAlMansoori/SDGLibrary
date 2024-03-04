@@ -1,6 +1,7 @@
 import pandas as pd
 from pdfminer.high_level import extract_text
 import csv
+from collections import defaultdict
 
 def load_keywords(csv_path):
     """Load keywords from CSV and organize them by category."""
@@ -20,24 +21,30 @@ def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path).lower()
 
 def match_keywords(text, category_keywords):
-    """Match keywords in text and return matching categories."""
-    matched_categories = set()
+    """Match keywords in text and return matching categories along with matched keywords."""
+    category_matches = defaultdict(lambda: {'count': 0, 'keywords': set()})
     for category, keywords in category_keywords.items():
         for keyword in keywords:
-            if f" {keyword} " in text:
-                matched_categories.add(category)
-                break  # Stop searching this category if a keyword matches
-    return matched_categories
+            occurrences = text.count(f" {keyword} ")
+            if occurrences > 0:
+                category_matches[category]['count'] += occurrences
+                category_matches[category]['keywords'].add(keyword)
+    
+    # Sort categories by the number of keyword occurrences in descending order
+    sorted_categories = sorted(category_matches.items(), key=lambda item: item[1]['count'], reverse=True)
+    return sorted_categories
 
 def categorize_document(pdf_path, keywords_csv):
-    """Determine the categories a PDF document belongs to based on keywords."""
+    """Determine the categories a PDF document belongs to based on keywords, including matched keywords."""
     category_keywords = load_keywords(keywords_csv)
     text = extract_text_from_pdf(pdf_path)
     matched_categories = match_keywords(text, category_keywords)
     return matched_categories
 
 # Example usage
-pdf_path = "src/components/assets/Collected Materials/ActionAid/Education_vs_austerity_English_online_2.pdf"
+pdf_path = "src/components/assets/Collected Materials/ActionAid/annual_report_2021_online.pdf"
 keywords_csv = "src/components/assets/keywords.csv"
 categories = categorize_document(pdf_path, keywords_csv)
-print("Document belongs to categories:", categories)
+
+for category, details in categories:
+    print(f"Category: {category}, Occurrences: {details['count']}, Matched Keywords: {', '.join(details['keywords'])}")
