@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  getAuth,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { app } from "../firebase.js";
 import Button from "@mui/material/Button";
@@ -10,11 +15,14 @@ import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
 import { Link, useNavigate } from "react-router-dom";
 import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
 
 export default function SignUp() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const auth = getAuth(app); // Use the Firebase app instance
   const db = getFirestore(app); // Initialize Firestore using your Firebase app
@@ -49,6 +57,40 @@ export default function SignUp() {
     }
   };
 
+  const handleEmailSignUp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const userCredentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredentials.user;
+
+      //Check if the user already exists
+      const userProfileRef = doc(db, "profiles", user.uid);
+      const userProfileSnap = await getDoc(userProfileRef);
+
+      if (!userProfileSnap.exists()) {
+        // no profile so we create a new one
+        await setDoc(userProfileRef, {
+          email: user.email,
+        });
+        // No profile found, navigate to profile creation page
+        navigate("/createProfile");
+      } else {
+        // User exists, navigate to home page
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Failed to sign up with email and password:", error);
+      setError("Failed to sign up with email and password: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Paper
       elevation={4}
@@ -73,13 +115,51 @@ export default function SignUp() {
           }}
         >
           <Typography component="h1" variant="h5">
-            Sign In
+            Sign Up
           </Typography>
           {error && (
             <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
               {error}
             </Alert>
           )}
+          <form onSubmit={handleEmailSignUp}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
+            >
+              Sign Up
+            </Button>
+          </form>
+
+          <Typography component="h1" variant="h5">
+            or
+          </Typography>
+
           <Button
             disabled={loading}
             onClick={handleGoogleSignUp}
@@ -88,26 +168,26 @@ export default function SignUp() {
             sx={{
               mt: 3,
               mb: 2,
-              position: "relative", 
+              position: "relative",
             }}
             startIcon={
               <span
                 style={{
-                  display: "inline-flex", 
+                  display: "inline-flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  borderRadius: "50%", 
-                  backgroundColor: "white", 
+                  borderRadius: "50%",
+                  backgroundColor: "white",
                   width: "30px",
                   height: "30px",
-                  marginRight: "8px", 
+                  marginRight: "8px",
                 }}
               >
                 <FcGoogle size={22} style={{ zIndex: 1 }} />
               </span>
             }
           >
-            Sign In with Google
+            Sign Up with Google
           </Button>
         </Box>
       </Container>
