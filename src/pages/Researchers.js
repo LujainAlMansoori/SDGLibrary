@@ -18,7 +18,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
-
 import Modal from "@mui/material/Modal";
 
 const remainingEmailsMessage = (emailCount, maxEmails) => {
@@ -181,6 +180,8 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
             }
             // alt={`${profile.firstName} ${profile.lastName}`}
             style={{
+              border: "1px solid #393939",
+              boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
               width: "125px",
               height: "125px",
               borderRadius: "50%",
@@ -410,6 +411,8 @@ const ProfilePopup = ({
                 // alt={`${profile.firstName} ${profile.lastName}`}
 
                 style={{
+                  border: "1px solid #393939",
+                  boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
                   width: "100px",
                   height: "100px",
                   borderRadius: "50%",
@@ -718,6 +721,7 @@ export default function Researchers() {
           </Box>
         </Modal>
       </div>
+
       {filteredProfiles.map((profile, index) => (
         <Paper
           key={index}
@@ -733,6 +737,8 @@ export default function Researchers() {
               }
               // alt={`${profile.firstName} ${profile.lastName}`}
               style={{
+                border: "1px solid #393939",
+                boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
                 borderRadius: "50%",
                 marginRight: "40px",
                 marginLeft: "40px",
@@ -767,22 +773,37 @@ export default function Researchers() {
           </IconButton>
         </Paper>
       ))}
+
       {selectedProfile && (
+         <Modal
+         open={selectedProfile} // Open the modal when there is a contactProfile
+         onClose={handleClosePopup}
+         BackdropProps={{ style: { backgroundColor: "transparent" } }} 
+       >
         <ProfileInfoPopup
           profile={selectedProfile}
           onClose={handleClosePopup}
         />
+          </Modal>
       )}
+
+
       {contactProfile && (
-        <ProfilePopup
-          profile={contactProfile}
+        <Modal
+          open={contactProfile} // Open the modal when there is a contactProfile
           onClose={handleClosePopup}
-          emailCount={emailCounts[contactProfile.id] || 0}
-          setEmailCount={(count) =>
-            setEmailCounts({ ...emailCounts, [contactProfile.id]: count })
-          }
-          maxEmails={maxEmails}
-        />
+          BackdropProps={{ style: { backgroundColor: "transparent" } }} 
+        >
+          <ProfilePopup
+            profile={contactProfile}
+            onClose={handleClosePopup}
+            emailCount={emailCounts[contactProfile.id] || 0}
+            setEmailCount={(count) =>
+              setEmailCounts({ ...emailCounts, [contactProfile.id]: count })
+            }
+            maxEmails={maxEmails}
+          />
+        </Modal>
       )}
     </div>
   );

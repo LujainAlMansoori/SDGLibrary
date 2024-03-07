@@ -7,10 +7,30 @@ import Popper from "@mui/material/Popper";
 import MenuItem from "@mui/material/MenuItem";
 import MenuList from "@mui/material/MenuList";
 import ArrowDownIcon from "@mui/icons-material/ArrowDropDown";
+import Modal from "@mui/material/Modal";
 
 export default function MenuListComposition({ logout, navigate }) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
+  const [modalOpen, setModalOpen] = React.useState(false);
+  // return focus to the button when we transitioned from !open -> open
+  const prevOpen = React.useRef(open);
+
+  const handleModalOpen = () => {
+    setModalOpen(true);
+  };
+
+  React.useEffect(() => {
+    if (prevOpen.current === true && open === false) {
+      anchorRef.current.focus();
+    }
+
+    prevOpen.current = open;
+  }, [open]);
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -38,8 +58,6 @@ export default function MenuListComposition({ logout, navigate }) {
     }
   };
 
-  // return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(open);
   React.useEffect(() => {
     if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
@@ -83,7 +101,7 @@ export default function MenuListComposition({ logout, navigate }) {
         role={undefined}
         placement="bottom-start"
         transition
-        style={{ zIndex: 1 }}
+        style={{ zIndex: 2000 }}
       >
         {({ TransitionProps }) => (
           <Grow {...TransitionProps}>
@@ -95,7 +113,7 @@ export default function MenuListComposition({ logout, navigate }) {
                   aria-labelledby="composition-button"
                   onKeyDown={handleListKeyDown}
                 >
-                  <MenuItem onClick={handleClose}>Profile</MenuItem>
+                  <MenuItem onClick={handleModalOpen}>Profile</MenuItem>
                   <MenuItem onClick={handleClose}>Settings</MenuItem>
                   <MenuItem
                     onClick={(event) => {
@@ -111,6 +129,17 @@ export default function MenuListComposition({ logout, navigate }) {
           </Grow>
         )}
       </Popper>
+      <Modal
+        open={modalOpen}
+        onClose={handleModalClose}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <div style={{ backgroundColor: "white", padding: 20 }}>
+          <h2 id="modal-title">Modal Title</h2>
+          <p id="modal-description">This is the modal content.</p>
+        </div>
+      </Modal>
     </div>
   );
 }
