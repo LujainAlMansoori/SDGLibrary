@@ -9,7 +9,7 @@ import MenuListComposition from "./menuListComponent.js"; // Import the MenuList
 
 export default function PageFooter() {
   return (
-    <div style={{ width: "100%" }}>
+    <div style={{ width: "100%", marginTop: "30px" }}>
       <nav
         className="navBar"
         style={{
