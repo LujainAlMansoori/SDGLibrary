@@ -33,7 +33,7 @@ function SearchPage() {
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
             material.tags.some((tag) =>
-              tag.toLowerCase().includes(searchQuery.toLowerCase())
+              tag.toLowerCase().includes(searchQuery.toLowerCase()) 
             ) ||
             material.institution
               .toLowerCase()
