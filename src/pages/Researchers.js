@@ -27,37 +27,6 @@ const remainingEmailsMessage = (emailCount, maxEmails) => {
 
   return "You cannot contact them anymore, you have already sent three emails.";
 };
-// sending others emails
-// const sendEmail = (e) => {
-//   e.preventDefault();
-
-// First check if the user can send them messages
-//   if (emailCount >= maxEmails) {
-//     alert(
-//       "You cannot contact them anymore, you have already sent three emails."
-//     );
-//     return;
-//   }
-
-//   emailjs
-//     .sendForm(
-//       "service_dnc473a",
-//       "template_1w5ueo3",
-//       e.target,
-//       "N1abVoGcbh8XG1Gp7"
-//     )
-//     .then(
-//       (result) => {
-//         console.log(result.text); // Handle the success response here
-//         e.target.reset();
-//         setEmailCount(emailCount + 1);
-//       },
-//       (error) => {
-//         console.log(error.text); // Handle the error response here
-//       }
-//     );
-// };
-
 const ProfileInfoPopup = ({ profile, onClose }) => {
   const { currentUser } = useAuth();
   const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);

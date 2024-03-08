@@ -37,7 +37,7 @@ export default function NewMaterial() {
     publisher: "",
     journalName: "",
     institution: "",
-    tags: "",
+    tags: [],
   });
   const [file, setFile] = useState(null);
   const [inputKey, setInputKey] = useState(Date.now());
@@ -109,7 +109,7 @@ export default function NewMaterial() {
         publisher: "",
         journalName: "",
         institution: "",
-        tags: "",
+        tags: [],
       });
       setFile(null);
       setInputKey(Date.now());
