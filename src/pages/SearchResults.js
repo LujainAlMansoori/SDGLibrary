@@ -20,6 +20,7 @@ import Box from "@mui/material/Box";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import SearchIcon from "@mui/icons-material/Search";
 import InputAdornment from "@mui/material/InputAdornment";
+import { Link } from "react-router-dom";
 
 import Modal from "@mui/material/Modal";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
@@ -28,6 +29,31 @@ export default function SearchResults() {
   const [materials, setMaterials] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate(); // Hook for navigation
+
+  const sdgTags = [
+    "SDG1 - No Poverty",
+    "SDG2 - Zero Hunger",
+    "SDG3 - Good Health and Well-being",
+    "SDG4 - Quality Education",
+    "SDG5 - Gender Equality",
+    "SDG6 - Clean Water and Sanitation",
+    "SDG7 - Affordable and Clean Energy",
+    "SDG8 - Decent Work and Economic Growth",
+    "SDG9 - Industry, Innovation and Infrastructure",
+    "SDG10 - Reduced Inequalities",
+    "SDG11 - Sustainable Cities and Communities",
+    "SDG12 - Responsible Consumption and Production",
+    "SDG13 - Climate Action",
+    "SDG14 - Life Below Water",
+    "SDG15 - Life on Land",
+    "SDG16 - Peace, Justice and Strong Institutions",
+    "SDG17 - Partnerships for the Goals",
+  ];
+
+  const sdgImages = Array.from(
+    { length: 17 },
+    (_, i) => `/SDG/SDG${i + 1}.png`
+  );
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -60,22 +86,14 @@ export default function SearchResults() {
     const searchLower = searchQuery.toLowerCase();
     return (
       material.title.toLowerCase().includes(searchLower) ||
-      (material.author &&
-        material.author.toLowerCase().includes(searchLower)) ||
-      (material.category &&
-        material.category.toLowerCase().includes(searchLower)) ||
-      (material.date_published &&
-        material.date_published.toLowerCase().includes(searchLower)) ||
-      (material.description &&
-        material.description.toLowerCase().includes(searchLower)) ||
-      (material.institution &&
-        material.institution.toLowerCase().includes(searchLower)) ||
-      (material.journalName &&
-        material.journalName.toLowerCase().includes(searchLower)) ||
-      (material.publisher &&
-        material.publisher.toLowerCase().includes(searchLower)) ||
-      (material.tags &&
-        material.tags.some((tag) => tag.toLowerCase().includes(searchLower)))
+      material.author.toLowerCase().includes(searchLower) ||
+      material.category.toLowerCase().includes(searchLower) ||
+      material.date_published.toLowerCase().includes(searchLower) ||
+      material.description.toLowerCase().includes(searchLower) ||
+      material.institution.toLowerCase().includes(searchLower) ||
+      material.journalName.toLowerCase().includes(searchLower) ||
+      material.publisher.toLowerCase().includes(searchLower) ||
+      material.tags.some((tag) => tag.toLowerCase().includes(searchLower))
     );
   });
 
@@ -109,6 +127,27 @@ export default function SearchResults() {
           ),
         }}
       />
+
+      {/* Add SDG images below search results */}
+      <div className="flex flex-wrap justify-center mt-5">
+        {sdgImages.map((imagePath, index) => (
+          <Link
+            to={`/search?query=${encodeURIComponent(sdgTags[index])}`}
+            key={index}
+          >
+            <img
+              src={imagePath}
+              alt={`SDG ${index + 1}`}
+              style={{
+                width: "calc((100% / 6) - 10px)", // Adjust width to fit 6 images in a row, accounting for margin
+                margin: "5px", // Add some space around the images
+                borderRadius: "10px", // Round the edges of the images
+                cursor: "pointer", // Change cursor to pointer on hover
+              }}
+            />
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

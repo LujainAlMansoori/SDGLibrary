@@ -32,11 +32,16 @@ function SearchPage() {
             material.category
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
-            material.tags.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            material.tags.some((tag) =>
+              tag.toLowerCase().includes(searchQuery.toLowerCase())
+            ) ||
             material.institution
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
             material.journalName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+              material.author
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
             material.publisher.toLowerCase().includes(searchQuery.toLowerCase())
