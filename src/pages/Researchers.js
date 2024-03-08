@@ -623,15 +623,17 @@ export default function Researchers() {
   // paper components style
 
   const paperStyle = {
-    marginLeft: "40px",
-    padding: "20px",
+    // marginLeft: "70px",
+    //padding: "15px",
+    margin: "15px",
     marginTop: "10px",
     marginBottom: "15px",
     display: "flex",
+
     alignItems: "center",
     justifyContent: "space-between",
-    width: 1350,
-    height: 100,
+    width: "calc(25% - 30px)",
+    height: 400,
     backgroundColor: "#F8FAFB",
   };
 
@@ -721,78 +723,96 @@ export default function Researchers() {
           </Box>
         </Modal>
       </div>
-
-      {filteredProfiles.map((profile, index) => (
-        <Paper
-          key={index}
-          elevation={3}
-          style={paperStyle}
-          onClick={() => handleProfileClick(profile)}
-        >
-          <div style={{ display: "flex", alignItems: "center" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", cursor: "pointer" }}>
+        {filteredProfiles.map((profile, index) => (
+          <Paper
+            key={index}
+            elevation={3}
+            style={{
+              ...paperStyle,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              position: "relative",
+            }}
+            onClick={() => handleProfileClick(profile)}
+          >
             <img
               src={
                 profile.profileImage ||
                 require("../components/assets/profile-photo.webp")
               }
-              // alt={`${profile.firstName} ${profile.lastName}`}
               style={{
-                border: "1px solid #393939",
-                boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
+                border: "0.5px solid #393939",
+                boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
                 borderRadius: "50%",
-                marginRight: "40px",
-                marginLeft: "40px",
-                width: "80px",
-                height: "80px",
+                marginTop: "70px",
+                // margin: "20px",
+                width: "150px",
+                height: "150px",
               }}
             />
-            <div>
-              <div style={{ cursor: "pointer" }}>
-                <div>{`${profile.title} ${profile.firstName} ${profile.lastName}`}</div>
-                <br />
-                <div>{profile.role}</div>
+            <div style={{ textAlign: "center", padding: "10px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  marginTop: "-150px",
+                  fontSize: "18px",
+                }}
+              >
+                <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
+                  {profile.title}
+                </div>
+                <div
+                  style={{ marginLeft: "5px", marginBottom: "5px" }}
+                >{`${profile.firstName} ${profile.lastName}`}</div>
               </div>
+              <div style={{ cursor: "pointer" }}>{profile.role}</div>
             </div>
-          </div>
-          <IconButton
-            onClick={(event) => handleContactClick(event, profile)}
-            className="noHoverEffect"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              cursor: "pointer",
-              marginRight: "20px",
-              fontFamily: "Times New Roman",
-              color: "black",
-              fontSize: "16px",
-              marginTop: "-20px",
-            }}
-          >
-            Contact{" "}
-            <EmailOutlinedIcon style={{ color: "black", marginLeft: "5px" }} />
-          </IconButton>
-        </Paper>
-      ))}
+            <IconButton
+              onClick={(event) => handleContactClick(event, profile)}
+              className="noHoverEffect"
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                cursor: "pointer",
+                fontFamily: "Times New Roman",
+                color: "black",
+                fontSize: "16px",
+              }}
+            >
+              Contact{" "}
+              <EmailOutlinedIcon
+                style={{ color: "black", marginLeft: "5px" }}
+              />
+            </IconButton>
+          </Paper>
+        ))}
+      </div>
 
       {selectedProfile && (
-         <Modal
-         open={selectedProfile} // Open the modal when there is a contactProfile
-         onClose={handleClosePopup}
-         BackdropProps={{ style: { backgroundColor: "transparent" } }} 
-       >
-        <ProfileInfoPopup
-          profile={selectedProfile}
+        <Modal
+          open={selectedProfile}
           onClose={handleClosePopup}
-        />
-          </Modal>
+          BackdropProps={{ style: { backgroundColor: "transparent" } }}
+        >
+          <ProfileInfoPopup
+            profile={selectedProfile}
+            onClose={handleClosePopup}
+          />
+        </Modal>
       )}
-
 
       {contactProfile && (
         <Modal
-          open={contactProfile} // Open the modal when there is a contactProfile
+          open={contactProfile}
           onClose={handleClosePopup}
-          BackdropProps={{ style: { backgroundColor: "transparent" } }} 
+          BackdropProps={{ style: { backgroundColor: "transparent" } }}
         >
           <ProfilePopup
             profile={contactProfile}
