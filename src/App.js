@@ -11,6 +11,7 @@ import Modal from "@mui/material/Modal";
 
 // Pages imported
 import SearchResults from "./pages/SearchResults.js";
+
 // Main is the home page
 import Main from "./pages/Main.js";
 import NewMaterial from "./pages/NewMaterial.js";
@@ -21,6 +22,9 @@ import Login from "./pages/Login.js";
 import CreateProfile from "./pages/createProfile.js";
 import AboutUs from "./pages/PageAboutUs.js";
 import AboutSDGLibrary from "./pages/AboutSDGLibrary.js";
+import SearchPage from "./pages/SearchPage";
+
+
 import Footer from "./components/pageFooter.js";
 import { app } from "./firebase";
 
@@ -61,40 +65,14 @@ function App() {
                 <Route path="/createprofile" element={<CreateProfile />} />
                 <Route path="/AboutSDGLibrary" element={<AboutSDGLibrary />} />
                 <Route path="/aboutUs" element={<AboutUs />} />
+                <Route path="/search" element={<SearchPage />} />
                 <Route path="*" element={<NoPage />} />
               </Routes>
             </div>
             <Footer />
           </div>
         </BrowserRouter>
-        <div>
-          {/*  This is just temporary to show all the materials in the DB */}
-          <div className="materials-list">
-            {materials.map((material) => (
-              <div key={material.id} className="material">
-                <div>
-                  <strong>ID:</strong> {material.id}
-                </div>
-                <div>
-                  <strong>Title:</strong> {material.Title}
-                </div>
-                <div>
-                  <strong>Author:</strong> {material.Author}
-                </div>
-                <div>
-                  <strong>URL:</strong>{" "}
-                  <a
-                    href={material.URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {material.URL}
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+
       </div>
     </AuthProvider>
   );
