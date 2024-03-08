@@ -5,6 +5,9 @@ import {
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
+import { PDFDocument } from "pdf-lib";
+import * as pdfjsLib from "pdfjs-dist/build/pdf";
+
 import db, { storage } from "../firebase";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -21,6 +24,8 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`;
+
 export default function NewMaterial() {
   const [materialDetails, setMaterialDetails] = useState({
     title: "",
@@ -32,7 +37,7 @@ export default function NewMaterial() {
     publisher: "",
     journalName: "",
     institution: "",
-    tags: "", // Initialize tags as an empty string
+    tags: "",
   });
   const [file, setFile] = useState(null);
   const [inputKey, setInputKey] = useState(Date.now());
@@ -42,7 +47,7 @@ export default function NewMaterial() {
       setFile(e.target.files[0]);
       setMaterialDetails({
         ...materialDetails,
-        fileName: e.target.files[0] ? e.target.files[0].name : "", // Update the fileName property
+        fileName: e.target.files[0] ? e.target.files[0].name : "",
       });
     } else {
       const { name, value } = e.target;
@@ -52,18 +57,45 @@ export default function NewMaterial() {
       });
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     let fileUrl = "";
+    let imageUrl = ""; // Variable to store the image URL
+
     if (file) {
       const fileStorageRef = storageRef(storage, `documents/${file.name}`);
       const uploadResult = await uploadBytes(fileStorageRef, file);
       fileUrl = await getDownloadURL(uploadResult.ref);
+
+      // Convert the first page of the PDF to an image
+      const pdfBytes = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+      const firstPage = await pdf.getPage(1);
+      const viewport = firstPage.getViewport({ scale: 1 });
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      await firstPage.render({ canvasContext: context, viewport: viewport })
+        .promise;
+
+      // Upload the image to Firebase
+      const imageBlob = await new Promise((resolve) => canvas.toBlob(resolve));
+      const imageRef = storageRef(
+        storage,
+        `documentImages/${file.name}_page_1.png`
+      );
+      const imageUploadResult = await uploadBytes(imageRef, imageBlob);
+      imageUrl = await getDownloadURL(imageUploadResult.ref);
     }
+
     const finalMaterialDetails = {
       ...materialDetails,
       documentUrl: fileUrl,
+      imageUrl: imageUrl, // Add the image URL to the material details
     };
+
     try {
       await addDoc(collection(db, "materials"), finalMaterialDetails);
       console.log("Document successfully written!");
@@ -77,7 +109,7 @@ export default function NewMaterial() {
         publisher: "",
         journalName: "",
         institution: "",
-        tags: "", // Reset tags to an empty string
+        tags: "",
       });
       setFile(null);
       setInputKey(Date.now());
@@ -94,7 +126,6 @@ export default function NewMaterial() {
         backgroundColor: "white",
         width: 700,
         marginLeft: "23%",
-        // height: 830,
         mb: 4,
         padding: 2,
         justifyContent: "center",
