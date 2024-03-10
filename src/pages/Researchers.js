@@ -13,6 +13,12 @@ import Button from "@mui/material/Button";
 import { doc, getDoc } from "firebase/firestore";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Box from "@mui/material/Box";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
+import Modal from "@mui/material/Modal";
 
 const remainingEmailsMessage = (emailCount, maxEmails) => {
   if (emailCount < maxEmails) {
@@ -21,37 +27,6 @@ const remainingEmailsMessage = (emailCount, maxEmails) => {
 
   return "You cannot contact them anymore, you have already sent three emails.";
 };
-// sending others emails
-// const sendEmail = (e) => {
-//   e.preventDefault();
-
-// First check if the user can send them messages
-//   if (emailCount >= maxEmails) {
-//     alert(
-//       "You cannot contact them anymore, you have already sent three emails."
-//     );
-//     return;
-//   }
-
-//   emailjs
-//     .sendForm(
-//       "service_dnc473a",
-//       "template_1w5ueo3",
-//       e.target,
-//       "N1abVoGcbh8XG1Gp7"
-//     )
-//     .then(
-//       (result) => {
-//         console.log(result.text); // Handle the success response here
-//         e.target.reset();
-//         setEmailCount(emailCount + 1);
-//       },
-//       (error) => {
-//         console.log(error.text); // Handle the error response here
-//       }
-//     );
-// };
-
 const ProfileInfoPopup = ({ profile, onClose }) => {
   const { currentUser } = useAuth();
   const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);
@@ -174,6 +149,8 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
             }
             // alt={`${profile.firstName} ${profile.lastName}`}
             style={{
+              border: "1px solid #393939",
+              boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
               width: "125px",
               height: "125px",
               borderRadius: "50%",
@@ -403,6 +380,8 @@ const ProfilePopup = ({
                 // alt={`${profile.firstName} ${profile.lastName}`}
 
                 style={{
+                  border: "1px solid #393939",
+                  boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
                   width: "100px",
                   height: "100px",
                   borderRadius: "50%",
@@ -509,16 +488,25 @@ export default function Researchers() {
   // keep track of the emails sent to avoid spam
   const [emailCount, setEmailCount] = useState(0);
   const [emailCounts, setEmailCounts] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSDGs, setSelectedSDGs] = useState("");
+  const [openFilter, setOpenFilter] = useState(false); // State to handle filter visibility
   const maxEmails = 3;
 
+  const handleCloseFilter = () => {
+    setOpenFilter(false);
+  };
   useEffect(() => {
     const fetchProfiles = async () => {
       const profilesCollection = collection(db, "profiles");
       const profilesSnapshot = await getDocs(profilesCollection);
-      const profilesList = profilesSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const profilesList = profilesSnapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .sort((a, b) => a.firstName.localeCompare(b.firstName));
+
       setProfiles(profilesList);
     };
 
@@ -548,84 +536,263 @@ export default function Researchers() {
     // }));
   };
 
+  //filter researchers by search query
+  const filteredProfiles = profiles.filter((profile) => {
+    const fullName =
+      `${profile.title} ${profile.firstName} ${profile.lastName}`.toLowerCase();
+    const bio = (profile.biography || "").toLowerCase();
+    const currentProjects = (profile.currentProjects || "").toLowerCase();
+    const sdgInterests = (profile.researchInterests || [])
+      .join(" ")
+      .toLowerCase();
+
+    const matchesSearchQuery =
+      fullName.includes(searchQuery.toLowerCase()) ||
+      bio.includes(searchQuery.toLowerCase()) ||
+      currentProjects.includes(searchQuery.toLowerCase()) ||
+      sdgInterests.includes(searchQuery.toLowerCase());
+
+    const matchesSDGInterests =
+      selectedSDGs.length === 0 ||
+      profile.researchInterests?.some((sdg) => selectedSDGs.includes(sdg));
+    return matchesSearchQuery && matchesSDGInterests;
+  });
+
+  const handleSDGChange = (event) => {
+    const value = event.target.value;
+    const newSelectedSDGs = selectedSDGs.includes(value)
+      ? selectedSDGs.filter((sdg) => sdg !== value)
+      : [...selectedSDGs, value];
+    setSelectedSDGs(newSelectedSDGs);
+  };
+
+  const sdglist = [
+    "SDG1 - No Poverty",
+    "SDG2 - Zero Hunger",
+    "SDG3 - Good Health and Well-being",
+    "SDG4 - Quality Education",
+    "SDG5 - Gender Equality",
+    "SDG6 - Clean Water and Sanitation",
+    "SDG7 - Affordable and Clean Energy",
+    "SDG8 - Decent Work and Economic Growth",
+    "SDG9 - Industry, Innovation, and Infrastructure",
+    "SDG10 - Reduced Inequality",
+    "SDG11 - Sustainable Cities and Communities",
+    "SDG12 - Responsible Consumption and Production",
+    "SDG13 - Climate Action",
+    "SDG14 - Life Below Water",
+    "SDG15 - Life on Land",
+    "SDG16 - Peace and Justice Strong Institutions",
+    "SDG17 - Partnerships to achieve the Goal",
+  ];
+  const clearSDGSelection = () => {
+    setSelectedSDGs([]);
+  };
+
+  // paper components style
+
+  const paperStyle = {
+    // marginLeft: "70px",
+    //padding: "15px",
+    margin: "15px",
+    marginTop: "10px",
+    marginBottom: "15px",
+    display: "flex",
+
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "calc(25% - 30px)",
+    height: 400,
+    backgroundColor: "#F8FAFB",
+  };
+
   return (
     <div>
       <div className="flex flex-col items-center justify-center">
         <p className="researchers-title">Researchers</p>
-      </div>
-      {profiles.map((profile, index) => (
-        <Paper
-          key={index}
-          elevation={3}
+        <TextField // Search bar
+          label="Search Researchers..."
+          variant="outlined"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           style={{
-            padding: "20px",
             margin: "10px 10px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: 1400,
-            height: 100,
+            marginLeft: "40px",
+            width: 1250,
           }}
-          onClick={() => handleProfileClick(profile)}
+          sx={{
+            borderRadius: "20px",
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "25px",
+            },
+          }}
+        />
+        <Button
+          onClick={() => setOpenFilter(true)}
+          sx={{
+            marginRight: "30px",
+            fontSize: "0.8rem",
+          }}
         >
-          <div style={{ display: "flex", alignItems: "center" }}>
+          Filter
+        </Button>
+        <Modal
+          open={openFilter}
+          onClose={handleCloseFilter}
+          sx={{
+            //Drop down box for SDG filter
+            display: "flex",
+            justifyContent: "right",
+            alignItems: "center",
+            marginRight: "60px",
+            marginTop: "-80px",
+          }}
+          BackdropProps={{ style: { backgroundColor: "transparent" } }}
+        >
+          <Box
+            sx={{
+              width: 430, // Width of the dropdown
+              maxHeight: 230,
+              overflowY: "auto", // Make it scrollable
+              bgcolor: "background.paper",
+              p: 2,
+              border: "1px solid #c4c4c4",
+              borderRadius: "10px", // Make it rounded
+              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+            }}
+          >
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Button
+                onClick={clearSDGSelection}
+                sx={{
+                  fontSize: "0.8rem",
+                  marginBottom: "-20px",
+                  marginLeft: 45, // Align the button to the right
+                }}
+              >
+                Clear
+              </Button>
+            </Box>
+            <FormGroup>
+              {sdglist.map((sdg) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={selectedSDGs.includes(sdg)}
+                      onChange={handleSDGChange}
+                      value={sdg}
+                    />
+                  }
+                  label={sdg}
+                  key={sdg}
+                  sx={{ fontSize: "0.8rem" }} // Smaller font size
+                />
+              ))}
+            </FormGroup>
+          </Box>
+        </Modal>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", cursor: "pointer" }}>
+        {filteredProfiles.map((profile, index) => (
+          <Paper
+            key={index}
+            elevation={3}
+            style={{
+              ...paperStyle,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              position: "relative",
+            }}
+            onClick={() => handleProfileClick(profile)}
+          >
             <img
               src={
                 profile.profileImage ||
                 require("../components/assets/profile-photo.webp")
               }
-              // alt={`${profile.firstName} ${profile.lastName}`}
               style={{
+                border: "0.5px solid #393939",
+                boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
                 borderRadius: "50%",
-                marginRight: "40px",
-                marginLeft: "40px",
-                width: "80px",
-                height: "80px",
+                marginTop: "70px",
+                // margin: "20px",
+                width: "150px",
+                height: "150px",
               }}
             />
-            <div>
-              <div style={{ cursor: "pointer" }}>
-                <div>{`${profile.title} ${profile.firstName} ${profile.lastName}`}</div>
-                <br />
-                <div>{profile.role}</div>
+            <div style={{ textAlign: "center", padding: "10px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                  marginTop: "-150px",
+                  fontSize: "18px",
+                }}
+              >
+                <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
+                  {profile.title}
+                </div>
+                <div
+                  style={{ marginLeft: "5px", marginBottom: "5px" }}
+                >{`${profile.firstName} ${profile.lastName}`}</div>
               </div>
+              <div style={{ cursor: "pointer" }}>{profile.role}</div>
             </div>
-          </div>
-          <IconButton
-            onClick={(event) => handleContactClick(event, profile)}
-            className="noHoverEffect"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              cursor: "pointer",
-              marginRight: "20px",
-              fontFamily: "Times New Roman",
-              color: "black",
-              fontSize: "16px",
-              marginTop: "-20px",
-            }}
-          >
-            Contact{" "}
-            <EmailOutlinedIcon style={{ color: "black", marginLeft: "5px" }} />
-          </IconButton>
-        </Paper>
-      ))}
+            <IconButton
+              onClick={(event) => handleContactClick(event, profile)}
+              className="noHoverEffect"
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                cursor: "pointer",
+                fontFamily: "Times New Roman",
+                color: "black",
+                fontSize: "16px",
+              }}
+            >
+              Contact{" "}
+              <EmailOutlinedIcon
+                style={{ color: "black", marginLeft: "5px" }}
+              />
+            </IconButton>
+          </Paper>
+        ))}
+      </div>
+
       {selectedProfile && (
-        <ProfileInfoPopup
-          profile={selectedProfile}
+        <Modal
+          open={selectedProfile}
           onClose={handleClosePopup}
-        />
+          BackdropProps={{ style: { backgroundColor: "transparent" } }}
+        >
+          <ProfileInfoPopup
+            profile={selectedProfile}
+            onClose={handleClosePopup}
+          />
+        </Modal>
       )}
+
       {contactProfile && (
-        <ProfilePopup
-          profile={contactProfile}
+        <Modal
+          open={contactProfile}
           onClose={handleClosePopup}
-          emailCount={emailCounts[contactProfile.id] || 0}
-          setEmailCount={(count) =>
-            setEmailCounts({ ...emailCounts, [contactProfile.id]: count })
-          }
-          maxEmails={maxEmails}
-        />
+          BackdropProps={{ style: { backgroundColor: "transparent" } }}
+        >
+          <ProfilePopup
+            profile={contactProfile}
+            onClose={handleClosePopup}
+            emailCount={emailCounts[contactProfile.id] || 0}
+            setEmailCount={(count) =>
+              setEmailCounts({ ...emailCounts, [contactProfile.id]: count })
+            }
+            maxEmails={maxEmails}
+          />
+        </Modal>
       )}
     </div>
   );

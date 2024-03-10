@@ -6,9 +6,12 @@ import NavBar from "./components/NavBar.js";
 import { AuthProvider } from "./contexts/AuthContexts.js";
 import { GoogleAuthProvider } from "firebase/auth";
 import { getAuth } from "firebase/auth";
+import "./components/style/Footer.css";
+import Modal from "@mui/material/Modal";
 
 // Pages imported
 import SearchResults from "./pages/SearchResults.js";
+
 // Main is the home page
 import Main from "./pages/Main.js";
 import NewMaterial from "./pages/NewMaterial.js";
@@ -17,7 +20,13 @@ import Researchers from "./pages/Researchers.js";
 import Signup from "./pages/Signup.js";
 import Login from "./pages/Login.js";
 import CreateProfile from "./pages/createProfile.js";
-import {app} from "./firebase"
+import AboutUs from "./pages/PageAboutUs.js";
+import AboutSDGLibrary from "./pages/AboutSDGLibrary.js";
+import SearchPage from "./pages/SearchPage";
+
+
+import Footer from "./components/pageFooter.js";
+import { app } from "./firebase";
 
 function App() {
   const provider = new GoogleAuthProvider();
@@ -42,48 +51,28 @@ function App() {
     <AuthProvider>
       <div>
         <BrowserRouter>
-          <NavBar />
-          <Routes>
-            <Route path="/" element={<Main />} />
-            <Route path="/home" element={<Main />} />
-            <Route path="/searchresults" element={<SearchResults />} />
-            <Route path="/newmaterial" element={<NewMaterial />} />
-            <Route path="/researchers" element={<Researchers />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="login" element={<Login />} />
-            <Route path="/createprofile" element={<CreateProfile />} />
-            <Route path="*" element={<NoPage />} />
-          </Routes>
+          <div className="app-container">
+            <NavBar />
+            <div className="main-content">
+              <Routes>
+                <Route path="/" element={<Main />} />
+                <Route path="/home" element={<Main />} />
+                <Route path="/searchresults" element={<SearchResults />} />
+                <Route path="/newmaterial" element={<NewMaterial />} />
+                <Route path="/researchers" element={<Researchers />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="login" element={<Login />} />
+                <Route path="/createprofile" element={<CreateProfile />} />
+                <Route path="/AboutSDGLibrary" element={<AboutSDGLibrary />} />
+                <Route path="/aboutUs" element={<AboutUs />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="*" element={<NoPage />} />
+              </Routes>
+            </div>
+            <Footer />
+          </div>
         </BrowserRouter>
 
-        <div>
-          {/*  This is just temporary to show all the materials in the DB */}
-          <div className="materials-list">
-            {materials.map((material) => (
-              <div key={material.id} className="material">
-                <div>
-                  <strong>ID:</strong> {material.id}
-                </div>
-                <div>
-                  <strong>Title:</strong> {material.Title}
-                </div>
-                <div>
-                  <strong>Author:</strong> {material.Author}
-                </div>
-                <div>
-                  <strong>URL:</strong>{" "}
-                  <a
-                    href={material.URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {material.URL}
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </AuthProvider>
   );

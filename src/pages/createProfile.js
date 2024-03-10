@@ -19,6 +19,7 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 
+
 import {
   uploadBytes,
   getDownloadURL,
@@ -34,6 +35,9 @@ import { doc, setDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContexts";
 
 export default function CreateProfile() {
+
+ 
+
   const { currentUser } = useAuth(); // Get the current user from the AuthContext
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -274,6 +278,8 @@ export default function CreateProfile() {
                   sx={{
                     width: 120,
                     height: 120,
+                    border: "1px solid #838181",
+                    boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.2)",
                     cursor: "pointer",
                     "& img": {
                       objectFit: "fit",
