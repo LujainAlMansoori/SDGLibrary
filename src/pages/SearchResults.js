@@ -30,6 +30,27 @@ export default function SearchResults() {
   const [materials, setMaterials] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate(); // Hook for navigation
+  const [tooltip, setTooltip] = useState({ show: false, text: "", x: 0, y: 0 });
+
+  const sdgTooltips = [
+    "End poverty in all its forms everywhere.",
+    "End hunger, achieve food security and improved nutrition, and promote sustainable agriculture.",
+    "Ensure healthy lives and promote well-being for all at all ages.",
+    "Ensure inclusive and equitable quality education and promote lifelong learning opportunities for all.",
+    "Achieve gender equality and empower all women and girls.",
+    "Ensure availability and sustainable management of water and sanitation for all.",
+    "Ensure access to affordable, reliable, sustainable, and modern energy for all.",
+    "Promote sustained, inclusive and sustainable economic growth, full and productive employment and decent work for all.",
+    "Build resilient infrastructure, promote inclusive and sustainable industrialization and foster innovation.",
+    "Reduce inequality within and among countries.",
+    "Make cities and human settlements inclusive, safe, resilient, and sustainable.",
+    "Ensure sustainable consumption and production patterns.",
+    "Take urgent action to combat climate change and its impacts.",
+    "Conserve and sustainably use the oceans, seas and marine resources for sustainable development.",
+    "Protect, restore and promote sustainable use of terrestrial ecosystems, sustainably manage forests, combat desertification, and halt and reverse land degradation and halt biodiversity loss.",
+    "Promote peaceful and inclusive societies for sustainable development, provide access to justice for all and build effective, accountable and inclusive institutions at all levels.",
+    "Strengthen the means of implementation and revitalize the Global Partnership for Sustainable Development.",
+  ];
 
   const sdgTags = [
     "SDG1 - No Poverty",
@@ -98,12 +119,26 @@ export default function SearchResults() {
     );
   });
 
+  const showTooltip = (index, e) => {
+    const rect = e.target.getBoundingClientRect();
+    const x = rect.left + window.scrollX + rect.width / 2;
+    const y = rect.top + window.scrollY - 10; // Adjust to position above the SDG image
+    setTooltip({
+      show: true,
+      text: sdgTooltips[index],
+      x,
+      y,
+    });
+  };
+
+  const hideTooltip = () => {
+    setTooltip({ show: false, text: "", x: 0, y: 0 });
+  };
+
   return (
     <div>
-     
-        <h2 className="researchers-title">Search the SDGLibrary</h2>
-        <div className="flex flex-col items-center justify-center">
-
+      <h2 className="researchers-title">Search the SDGLibrary</h2>
+      <div className="flex flex-col items-center justify-center">
         <div
           style={{
             marginBottom: "60px",
@@ -139,13 +174,38 @@ export default function SearchResults() {
             }}
           />
         </div>
+        {tooltip.show && (
+          <div
+            style={{
+              position: "absolute",
+              top: `${tooltip.y + 120}px`,
+              left: `${tooltip.x - 140}px`,
+              marginRight: "20px",
+              backgroundColor: "white",
+              padding: "20px 20px",
+              borderRadius: "5px",
+              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
+              zIndex: 30,
+
+              whiteSpace: "normal", // Allows text to wrap
+              maxWidth: "30ch",
+              overflowWrap: "break-word",
+            }}
+          >
+            {tooltip.text}
+          </div>
+        )}
+
+        {/* SDG Images Mapping */}
         <div className="flex flex-wrap justify-center mt-5 w-full">
           {sdgImages.map((imagePath, index) => (
             <Link
               to={`/search?query=${encodeURIComponent(sdgTags[index])}`}
               key={index}
+              onMouseEnter={(e) => showTooltip(index, e)}
+              onMouseLeave={hideTooltip}
               style={{
-                paddingLeft: index % 4 === 0 ? "140px" : "10px", // Adjust paddingLeft for every 4th image
+                paddingLeft: index % 4 === 0 ? "140px" : "10px",
               }}
             >
               <img
