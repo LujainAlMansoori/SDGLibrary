@@ -173,7 +173,7 @@ export default function CreateProfile() {
           <Typography
             component="h1"
             variant="h4"
-            sx={{ fontFamily: "Times New Roman" }}
+            sx={{ fontFamily: "Tenor Sans" }}
           >
             Create Your Profile
           </Typography>
