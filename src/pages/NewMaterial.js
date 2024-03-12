@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
+import { collection, addDoc, doc } from "firebase/firestore";
 import {
   ref as storageRef,
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
-import { PDFDocument } from "pdf-lib";
+// import { PDFDocument } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 
 import db, { storage } from "../firebase";
@@ -40,15 +40,27 @@ export default function NewMaterial() {
     tags: [],
   });
   const [file, setFile] = useState(null);
+  const [documentUrl, setDocumentUrl] = useState("");
   const [inputKey, setInputKey] = useState(Date.now());
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    console.log("Document URL changed:", documentUrl);
+  }, [documentUrl]);
+
+  const handleChange = async (e) => {
     if (e.target.type === "file") {
       setFile(e.target.files[0]);
       setMaterialDetails({
         ...materialDetails,
         fileName: e.target.files[0] ? e.target.files[0].name : "",
       });
+
+      // file upload
+      const fileStorageRef = storageRef(storage, `documents/${e.target.files[0].name}`);
+      const uploadResult = await uploadBytes(fileStorageRef, file);
+      const fileUrl = await getDownloadURL(uploadResult.ref);
+      setDocumentUrl(fileUrl);
+
     } else {
       const { name, value } = e.target;
       setMaterialDetails({
@@ -60,14 +72,9 @@ export default function NewMaterial() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let fileUrl = "";
     let imageUrl = ""; // Variable to store the image URL
 
     if (file) {
-      const fileStorageRef = storageRef(storage, `documents/${file.name}`);
-      const uploadResult = await uploadBytes(fileStorageRef, file);
-      fileUrl = await getDownloadURL(uploadResult.ref);
-
       // Convert the first page of the PDF to an image
       const pdfBytes = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
@@ -92,7 +99,7 @@ export default function NewMaterial() {
 
     const finalMaterialDetails = {
       ...materialDetails,
-      documentUrl: fileUrl,
+      documentUrl: documentUrl,
       imageUrl: imageUrl, // Add the image URL to the material details
     };
 
@@ -112,6 +119,7 @@ export default function NewMaterial() {
         tags: [],
       });
       setFile(null);
+      setDocumentUrl("");
       setInputKey(Date.now());
     } catch (error) {
       console.error("Error writing document: ", error);
