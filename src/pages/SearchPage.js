@@ -33,7 +33,7 @@ function SearchPage() {
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
             material.tags.some((tag) =>
-              tag.toLowerCase().includes(searchQuery.toLowerCase()) 
+              tag.toLowerCase().includes(searchQuery.toLowerCase())
             ) ||
             material.institution
               .toLowerCase()
@@ -41,9 +41,7 @@ function SearchPage() {
             material.journalName
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
-              material.author
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
+            material.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
             material.publisher.toLowerCase().includes(searchQuery.toLowerCase())
           );
         });

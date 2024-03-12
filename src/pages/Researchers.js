@@ -408,7 +408,7 @@ const ProfilePopup = ({
                   profile.profileImage ||
                   require("../components/assets/profile-photo.webp")
                 }
-                // alt={`${profile.firstName} ${profile.lastName}`}
+           
 
                 style={{
                   border: "1px solid #393939",

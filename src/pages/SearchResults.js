@@ -101,7 +101,7 @@ export default function SearchResults() {
     <div className="flex flex-col items-center justify-center">
       <p className="researchers-title">Materials</p>
       <TextField
-        label="Search..."
+        label="Search by title, author, description, category..."
         variant="outlined"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
