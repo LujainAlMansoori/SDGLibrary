@@ -194,7 +194,7 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
               component="h1"
               variant="h4"
               sx={{
-                fontFamily: "Times New Roman",
+                fontFamily: "Tensor Sans",
               }}
             >
               {`${profile.title} ${profile.firstName} ${profile.lastName}`}
@@ -203,7 +203,7 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
               component="h1"
               variant="h5"
               sx={{
-                fontFamily: "Times New Roman",
+                fontFamily: "Tensor Sans",
                 marginBottom: "20px",
               }}
             >
@@ -215,7 +215,7 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
 
       <Typography
         sx={{
-          fontFamily: "Times New Roman",
+          fontFamily: "Tensor Sans",
           marginTop: "40px",
           marginBottom: "20px",
           marginLeft: "120px",
@@ -230,7 +230,7 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
       </Typography>
       <Typography
         sx={{
-          fontFamily: "Times New Roman",
+          fontFamily: "Tensor Sans",
           textAlign: "left",
           marginLeft: "120px",
           maxWidth: "80%",
@@ -245,7 +245,7 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
 
       <Typography
         sx={{
-          fontFamily: "Times New Roman",
+          fontFamily: "Tensor Sans",
           textAlign: "left",
           marginLeft: "120px",
           maxWidth: "80%",
@@ -381,7 +381,7 @@ const ProfilePopup = ({
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            fontFamily: "Times New Roman",
+            fontFamily: "Tensor Sans",
             paddingTop: "50px",
             margin: "auto",
             width: "100%",
@@ -408,8 +408,6 @@ const ProfilePopup = ({
                   profile.profileImage ||
                   require("../components/assets/profile-photo.webp")
                 }
-           
-
                 style={{
                   border: "1px solid #393939",
                   boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
@@ -423,7 +421,7 @@ const ProfilePopup = ({
                 component="h1"
                 variant="h4"
                 sx={{
-                  fontFamily: "Times New Roman",
+                  fontFamily: "Tensor Sans",
                 }}
               >
                 Contact{" "}
@@ -435,7 +433,7 @@ const ProfilePopup = ({
         {emailCount < maxEmails && (
           <Typography
             sx={{
-              fontFamily: "Times New Roman",
+              fontFamily: "Tensor Sans",
               marginTop: "20px",
               textAlign: "left",
               marginLeft: "150px",
@@ -497,7 +495,7 @@ const ProfilePopup = ({
                 mt: 5,
                 mb: 2,
                 width: 400,
-                fontFamily: "Times New Roman",
+                fontFamily: "Tensor Sans",
                 display: "block",
                 marginLeft: "auto",
                 marginRight: "auto",
@@ -640,7 +638,7 @@ export default function Researchers() {
   return (
     <div>
       <div className="flex flex-col items-center justify-center">
-        <p className="researchers-title">Researchers</p>
+        <h2 className="researchers-title">Researchers</h2>
         <TextField // Search bar
           label="Search Researchers..."
           variant="outlined"
@@ -781,7 +779,7 @@ export default function Researchers() {
                 top: "10px",
                 right: "10px",
                 cursor: "pointer",
-                fontFamily: "Times New Roman",
+                fontFamily: "Tensor Sans",
                 color: "black",
                 fontSize: "16px",
               }}

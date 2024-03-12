@@ -11,6 +11,8 @@ body {
     align-items: center;
     justify-content: flex-start;
     z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-family: 'Tenor Sans', sans-serif;
     
 }
 

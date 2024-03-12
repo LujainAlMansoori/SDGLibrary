@@ -1,3 +1,4 @@
+// This is the page when they first enter the searching section
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
@@ -98,55 +99,69 @@ export default function SearchResults() {
   });
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <p className="researchers-title">Materials</p>
-      <TextField
-        label="Search by title, author, description, category..."
-        variant="outlined"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        onKeyPress={handleKeyPress}
-        style={{
-          margin: "10px 10px",
-          marginLeft: "40px",
-          width: 1250,
-        }}
-        sx={{
-          borderRadius: "20px",
-          "& .MuiOutlinedInput-root": {
-            borderRadius: "25px",
-          },
-        }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={handleSearch}>
-                <SearchIcon />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+    <div>
+     
+        <h2 className="researchers-title">Search the SDGLibrary</h2>
+        <div className="flex flex-col items-center justify-center">
 
-      {/* Add SDG images below search results */}
-      <div className="flex flex-wrap justify-center mt-5">
-        {sdgImages.map((imagePath, index) => (
-          <Link
-            to={`/search?query=${encodeURIComponent(sdgTags[index])}`}
-            key={index}
-          >
-            <img
-              src={imagePath}
-              alt={`SDG ${index + 1}`}
+        <div
+          style={{
+            marginBottom: "60px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <TextField
+            label="Search by title, author, publication, description, type, and, SDG tag..."
+            variant="outlined"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={handleKeyPress}
+            style={{
+              width: 900,
+              marginTop: "-20px",
+              marginBottom: "40px",
+            }}
+            sx={{
+              borderRadius: "20px",
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "25px",
+              },
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleSearch}>
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </div>
+        <div className="flex flex-wrap justify-center mt-5 w-full">
+          {sdgImages.map((imagePath, index) => (
+            <Link
+              to={`/search?query=${encodeURIComponent(sdgTags[index])}`}
+              key={index}
               style={{
-                width: "calc((100% / 6) - 10px)", // Adjust width to fit 6 images in a row, accounting for margin
-                margin: "5px", // Add some space around the images
-                borderRadius: "10px", // Round the edges of the images
-                cursor: "pointer", // Change cursor to pointer on hover
+                paddingLeft: index % 4 === 0 ? "140px" : "10px", // Adjust paddingLeft for every 4th image
               }}
-            />
-          </Link>
-        ))}
+            >
+              <img
+                src={imagePath}
+                alt={`SDG ${index + 1}`}
+                style={{
+                  width: "calc((100% / 4) - 90px)",
+                  margin: "5px",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  boxShadow: "2px 4px 10px rgba(0, 0, 2, 0.2)",
+                }}
+              />
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
