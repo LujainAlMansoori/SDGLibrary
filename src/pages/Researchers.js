@@ -632,7 +632,6 @@ const ProfilePopup = ({
             </div>
           </div>
         </Typography>
-       
 
         {/* Popup content */}
         <div>
