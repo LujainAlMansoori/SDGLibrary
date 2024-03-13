@@ -55,3 +55,14 @@ categories = categorize_document_from_urls(pdf_url, keywords_csv_url)
 
 for category, details in categories:
     print(f"Category: {category}, Occurrences: {details['count']}, Matched Keywords: {', '.join(details['keywords'])}")
+
+'''
+curl -X POST \
+  https://tag-pdf-dmyfoapmsq-uc.a.run.app \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "pdfUrl": "https://firebasestorage.googleapis.com/v0/b/sdglibrary-dfc2c.appspot.com/o/documents%2FEducation_vs_austerity_English_online_2.pdf?alt=media&token=880d1f28-c897-4f2d-9fd9-d46220f25748",
+    "keywordsCsvUrl": "https://firebasestorage.googleapis.com/v0/b/sdglibrary-dfc2c.appspot.com/o/keywords.csv?alt=media&token=3d65b7b6-31bc-4245-b777-30559570f050"
+  }'
+
+'''

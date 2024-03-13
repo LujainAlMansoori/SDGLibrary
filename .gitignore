@@ -23,3 +23,4 @@ yarn-debug.log*
 yarn-error.log*
 src/components/assets/Collected Materials
 src/pages/text.js
+*.log

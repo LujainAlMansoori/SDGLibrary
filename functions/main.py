@@ -5,6 +5,8 @@ from pdfminer.high_level import extract_text
 import csv
 from collections import defaultdict
 from io import StringIO, BytesIO
+import json
+from flask_cors import cross_origin
 
 # Initialize Firebase Admin SDK
 initialize_app()
@@ -54,6 +56,8 @@ def categorize_document_from_urls(pdf_url, keywords_csv_url):
     return matched_categories
 
 @https_fn.on_request()
+@cross_origin()
+
 def tag_pdf(req: https_fn.Request) -> https_fn.Response:
     request_json = req.get_json(silent=True)
     if not request_json or 'pdfUrl' not in request_json or 'keywordsCsvUrl' not in request_json:
@@ -64,8 +68,9 @@ def tag_pdf(req: https_fn.Request) -> https_fn.Response:
     
     try:
         categories = categorize_document_from_urls(pdf_url, keywords_csv_url)
-        # Convert your result to a string or JSON for returning
-        result = str(categories) # Simplified, consider formatting as JSON
-        return https_fn.Response(result)
+        # Format the response as JSON
+        formatted_result = {category: list(details['keywords']) for category, details in categories}
+        return https_fn.Response(json.dumps(formatted_result), mimetype="application/json")
     except Exception as e:
         return https_fn.Response(f"Error processing document: {str(e)}", status=500)
+
