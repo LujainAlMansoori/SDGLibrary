@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import {
   ref as storageRef,
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
-import { PDFDocument } from "pdf-lib";
+// import { PDFDocument } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 
 import db, { storage } from "../firebase";
+import Chip from '@mui/material/Chip';
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -23,8 +24,13 @@ import Select from "@mui/material/Select";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { styled } from '@mui/material/styles';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.js`;
+
+const ListItem = styled('li')(({ theme }) => ({
+  margin: theme.spacing(0.5),
+}));
 
 export default function NewMaterial() {
   const [materialDetails, setMaterialDetails] = useState({
@@ -40,16 +46,88 @@ export default function NewMaterial() {
     tags: [],
   });
   const [file, setFile] = useState(null);
+  const [documentUrl, setDocumentUrl] = useState("");
   const [inputKey, setInputKey] = useState(Date.now());
+  const [tagInput, setTagInput] = useState("");
+  const keywordsCsvUrl = "https://firebasestorage.googleapis.com/v0/b/sdglibrary-dfc2c.appspot.com/o/keywords.csv?alt=media&token=3d65b7b6-31bc-4245-b777-30559570f050"
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    console.log("Document URL changed:", documentUrl);
+    if (documentUrl) {
+      fetchAndSetTags(documentUrl, keywordsCsvUrl);
+    }
+  }, [documentUrl]);
+
+  useEffect(() => {
+    console.log("Material Details", materialDetails);
+  }, [materialDetails]);
+
+  const handleDeleteTag = (tagToDelete) => () => {
+    setMaterialDetails({
+      ...materialDetails,
+      tags: materialDetails.tags.filter((tag) => tag !== tagToDelete),
+    });
+  };
+
+  // Function that calls the tag_pdf Cloud Function and updates the state with tags
+  const fetchAndSetTags = async (pdfUrl, keywordsCsvUrl) => {
+    try {
+      const response = await fetch('https://tag-pdf-dmyfoapmsq-uc.a.run.app', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pdfUrl, keywordsCsvUrl }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch tags');
+      }
+
+      const tagsData = await response.json();
+      const newTags = Object.entries(tagsData).flatMap(([category, keywords]) =>
+        keywords.map(keyword => `${category}: ${keyword}`));
+
+      setMaterialDetails(prevDetails => ({
+        ...prevDetails,
+        tags: [...prevDetails.tags, ...newTags],
+      }));
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+    }
+  };
+
+  const handleChange = async (e) => {
     if (e.target.type === "file") {
-      setFile(e.target.files[0]);
+      const newFile = e.target.files[0];
+      setFile(newFile);
       setMaterialDetails({
         ...materialDetails,
-        fileName: e.target.files[0] ? e.target.files[0].name : "",
+        fileName: newFile ? newFile.name : "",
       });
-    } else {
+
+      // file upload
+      const fileStorageRef = storageRef(storage, `documents/${newFile.name}`);
+      try {
+        const uploadResult = await uploadBytes(fileStorageRef, newFile);
+        const newDocumentUrl = await getDownloadURL(uploadResult.ref);
+        console.log("New file URL:", newDocumentUrl);
+        setDocumentUrl(newDocumentUrl);
+      } catch (error) {
+        console.error("Error uploading file: ", error);
+      }
+    }
+    else if (e.key === 'Enter' && tagInput) {
+      e.preventDefault();
+      if (!materialDetails.tags.includes(tagInput.trim())) { // Prevent duplicate tags
+        setMaterialDetails({
+          ...materialDetails,
+          tags: [...materialDetails.tags, tagInput.trim()],
+        });
+      }
+      setTagInput(""); // Clear input field
+    }
+    else {
       const { name, value } = e.target;
       setMaterialDetails({
         ...materialDetails,
@@ -60,14 +138,9 @@ export default function NewMaterial() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    let fileUrl = "";
     let imageUrl = ""; // Variable to store the image URL
 
     if (file) {
-      const fileStorageRef = storageRef(storage, `documents/${file.name}`);
-      const uploadResult = await uploadBytes(fileStorageRef, file);
-      fileUrl = await getDownloadURL(uploadResult.ref);
-
       // Convert the first page of the PDF to an image
       const pdfBytes = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
@@ -92,7 +165,7 @@ export default function NewMaterial() {
 
     const finalMaterialDetails = {
       ...materialDetails,
-      documentUrl: fileUrl,
+      documentUrl: documentUrl,
       imageUrl: imageUrl, // Add the image URL to the material details
     };
 
@@ -112,6 +185,7 @@ export default function NewMaterial() {
         tags: [],
       });
       setFile(null);
+      setDocumentUrl("");
       setInputKey(Date.now());
     } catch (error) {
       console.error("Error writing document: ", error);
@@ -288,7 +362,36 @@ export default function NewMaterial() {
                   disabled
                 />
               </Grid>
-
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Tags"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleChange}
+                  helperText="Press enter to add tags"
+                />
+                <Paper
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    flexWrap: 'wrap',
+                    listStyle: 'none',
+                    p: 0.5,
+                    m: 0,
+                  }}
+                  component="ul"
+                >
+                  {materialDetails.tags.map((tag, index) => (
+                    <ListItem key={index}>
+                      <Chip
+                        label={tag}
+                        onDelete={handleDeleteTag(tag)}
+                      />
+                    </ListItem>
+                  ))}
+                </Paper>
+              </Grid>
               <Grid item xs={12}>
                 <Button
                   type="submit"
