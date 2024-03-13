@@ -19,7 +19,6 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 
-
 import {
   uploadBytes,
   getDownloadURL,
@@ -35,9 +34,6 @@ import { doc, setDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContexts";
 
 export default function CreateProfile() {
-
- 
-
   const { currentUser } = useAuth(); // Get the current user from the AuthContext
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -117,6 +113,8 @@ export default function CreateProfile() {
       lastName: event.target.lastName.value,
       role: event.target.role.value,
       biography: event.target.biography.value,
+      linkedinName: event.target.linkedinName.value,
+      linkedin: event.target.linkedin.value,
       currentProjects: event.target.currentProjects.value,
       researchInterests: selectedSDGs,
       profileImage: profileImageUrl,
@@ -191,7 +189,6 @@ export default function CreateProfile() {
             sx={{ mt: 4 }}
           >
             <Grid container spacing={2}>
-              {/* Title, First Name, Last Name, Role */}
               <Grid item xs={9}>
                 <Grid container spacing={2}>
                   <Grid item xs={3}>
@@ -235,6 +232,7 @@ export default function CreateProfile() {
                       }}
                     />
                   </Grid>
+
                   <Grid item xs={4.5}>
                     <TextField
                       required
@@ -303,7 +301,45 @@ export default function CreateProfile() {
                   accept="image/*"
                 />
               </Grid>
-              {/* Biography Field */}
+
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="linkedinName"
+                  label="LinkedIn Username"
+                  multiline
+                  rows={1}
+                  autoComplete="linkedinName"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "&.Mui-focused fieldset": {
+                        borderColor: "black",
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="linkedin"
+                  label="Link to LinkedIn"
+                  multiline
+                  rows={1}
+                  autoComplete="linkedin"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "&.Mui-focused fieldset": {
+                        borderColor: "black",
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+
               <Grid item xs={12}>
                 <TextField
                   required

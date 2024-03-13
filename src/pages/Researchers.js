@@ -8,7 +8,7 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import "../components/style/noHover.css";
 import emailjs from "emailjs-com";
 import { useAuth } from "../contexts/AuthContexts";
-import Typography from "@mui/material/Typography";
+import { Typography, Link } from "@mui/material";
 import Button from "@mui/material/Button";
 import { doc, getDoc } from "firebase/firestore";
 import TextField from "@mui/material/TextField";
@@ -19,49 +19,89 @@ import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Modal from "@mui/material/Modal";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import InfoIcon from "@mui/icons-material/Info";
+import { setDoc } from "firebase/firestore";
+import "../components/style/ErrorMessages.css";
 
 const remainingEmailsMessage = (emailCount, maxEmails) => {
   if (emailCount < maxEmails) {
     return `You have ${maxEmails - emailCount} email(s) left.`;
   }
 
-  return "You cannot contact them anymore, you have already sent three emails.";
+  return "You have already sent three emails, please wait for them to reply.";
 };
-// sending others emails
-// const sendEmail = (e) => {
-//   e.preventDefault();
 
-// First check if the user can send them messages
-//   if (emailCount >= maxEmails) {
-//     alert(
-//       "You cannot contact them anymore, you have already sent three emails."
-//     );
-//     return;
-//   }
+const ProfileInfoPopup = ({
+  profile,
+  onClose,
+  handleContactClick,
+  emailCounts,
+}) => {
+  const maxEmails = 3;
+  const [errorMessage, setErrorMessage] = useState({ text: "", show: false });
+  const [confirmMessage, setConfirmMessage] = useState({
+    text: "",
+    show: false,
+  });
 
-//   emailjs
-//     .sendForm(
-//       "service_dnc473a",
-//       "template_1w5ueo3",
-//       e.target,
-//       "N1abVoGcbh8XG1Gp7"
-//     )
-//     .then(
-//       (result) => {
-//         console.log(result.text); // Handle the success response here
-//         e.target.reset();
-//         setEmailCount(emailCount + 1);
-//       },
-//       (error) => {
-//         console.log(error.text); // Handle the error response here
-//       }
-//     );
-// };
-
-const ProfileInfoPopup = ({ profile, onClose }) => {
   const { currentUser } = useAuth();
   const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);
+  const [sdgTooltip, setSdgTooltip] = useState({
+    show: false,
+    text: "",
+    x: 0,
+    y: 0,
+  });
 
+  const sdgTooltips = [
+    "End poverty in all its forms everywhere.",
+    "End hunger, achieve food security and improved nutrition, and promote sustainable agriculture.",
+    "Ensure healthy lives and promote well-being for all at all ages.",
+    "Ensure inclusive and equitable quality education and promote lifelong learning opportunities for all.",
+    "Achieve gender equality and empower all women and girls.",
+    "Ensure availability and sustainable management of water and sanitation for all.",
+    "Ensure access to affordable, reliable, sustainable, and modern energy for all.",
+    "Promote sustained, inclusive and sustainable economic growth, full and productive employment and decent work for all.",
+    "Build resilient infrastructure, promote inclusive and sustainable industrialization and foster innovation.",
+    "Reduce inequality within and among countries.",
+    "Make cities and human settlements inclusive, safe, resilient, and sustainable.",
+    "Ensure sustainable consumption and production patterns.",
+    "Take urgent action to combat climate change and its impacts.",
+    "Conserve and sustainably use the oceans, seas and marine resources for sustainable development.",
+    "Protect, restore and promote sustainable use of terrestrial ecosystems, sustainably manage forests, combat desertification, and halt and reverse land degradation and halt biodiversity loss.",
+    "Promote peaceful and inclusive societies for sustainable development, provide access to justice for all and build effective, accountable and inclusive institutions at all levels.",
+    "Strengthen the means of implementation and revitalize the Global Partnership for Sustainable Development.",
+  ];
+  if (sdgTooltip.show) {
+    console.log("Tooltip top position (sdgTooltip.y):", sdgTooltip.y);
+  }
+
+  const showSdgTooltip = (sdgIndex, event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = rect.left + window.scrollX + rect.width / 2 - 100; // Centers the tooltip on the X-axis
+    const offset = 10; // 10px space between the image bottom and the tooltip
+    // Calculate Y to place the tooltip just below the image, including any scroll offset and a small space
+    const y = rect.bottom + offset + 170;
+
+    setSdgTooltip({
+      show: true,
+      text: sdgTooltips[sdgIndex],
+      x,
+      y,
+    });
+
+    setSdgTooltip({
+      show: true,
+      text: sdgTooltips[sdgIndex],
+      x,
+      y,
+    });
+  };
+  const hideSdgTooltip = () => {
+    console.log("Hiding SDG tooltip");
+    setSdgTooltip({ show: false, text: "", x: 0, y: 0 });
+  };
   useEffect(() => {
     async function fetchProfileofCurrentUser() {
       if (currentUser) {
@@ -94,7 +134,8 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
   };
 
   // Component to render SDG images
-  const SDGImages = ({ researchInterests }) => {
+  const SDGImages = ({ researchInterests, showSdgTooltip, hideSdgTooltip }) => {
+    const getSDGImagePath = (sdgNumber) => `./SDG/SDG${sdgNumber}.png`;
     const sortedInterests = researchInterests
       .map((interest) => ({
         interest,
@@ -102,22 +143,55 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
       }))
       .sort((a, b) => a.number - b.number) // Sort by the SDG number
       .map((item) => item.interest); // Map back to the original interest string
+
+    const toggleSdgTooltip = (sdgIndex, event) => {
+      if (sdgTooltip.show && sdgTooltip.text === sdgTooltips[sdgIndex]) {
+        hideSdgTooltip();
+      } else {
+        showSdgTooltip(sdgIndex, event);
+      }
+    };
     return (
       <div style={{ display: "flex", flexWrap: "wrap" }}>
-        {sortedInterests.map((interest, index) => {
-          const sdgNumber = interest.match(/SDG(\d+)/)[1]; // Extracts the number from the string
+        {researchInterests.map((interest, index) => {
+          const sdgNumber = interest.match(/SDG(\d+)/)[1];
           return (
-            <img
-              key={index}
-              src={getSDGImagePath(sdgNumber)}
-              alt={`SDG ${sdgNumber}`}
-              style={{
-                width: "100px",
-                height: "100px",
-                marginRight: "5px", // Add space between images
-                marginBottom: "5px", // Wrap to the next line for every 5 images
-              }}
-            />
+            <ClickAwayListener onClickAway={hideSdgTooltip} key={index}>
+              <div
+                style={{
+                  position: "relative",
+                  marginRight: "10px",
+                  marginBottom: "5px",
+                }}
+              >
+                <img
+                  src={getSDGImagePath(sdgNumber)}
+                  alt={`SDG ${sdgNumber}`}
+                  style={{
+                    width: "200px",
+                    height: "200px",
+                  }}
+                />
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleSdgTooltip(index, e);
+                  }}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+
+                    color: "white",
+                    cursor: "pointer",
+                    backgroundColor: "transparent",
+                    borderRadius: "50%",
+                  }}
+                >
+                  <InfoIcon />
+                </IconButton>
+              </div>
+            </ClickAwayListener>
           );
         })}
       </div>
@@ -134,7 +208,7 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
         bottom: 0,
         width: "75%",
         backgroundColor: "white",
-        zIndex: 1000,
+        zIndex: 300,
         overflowY: "auto",
         border: "1px solid #e0e0e0",
         boxShadow:
@@ -158,11 +232,31 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
           backgroundColor: "#f0f0f0",
           color: "black",
           fontSize: "10px",
+          marginTop: "10px",
+          marginLeft: "30px",
         }}
       >
         X
       </button>
-
+      {(emailCounts[profile.id] + 1 || 0) < maxEmails && (
+        <IconButton
+          onClick={(event) => handleContactClick(event, profile)}
+          className="noHoverEffect"
+          style={{
+            position: "absolute",
+            top: "20px",
+            right: "10px",
+            cursor: "pointer",
+            fontFamily: "Tensor Sans",
+            color: "black",
+            fontSize: "16px",
+            marginRight: "60px",
+          }}
+        >
+          Contact{" "}
+          <EmailOutlinedIcon style={{ color: "black", marginLeft: "5px" }} />
+        </IconButton>
+      )}
       <div
         style={{
           display: "flex",
@@ -223,11 +317,36 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
           maxWidth: "80%",
         }}
       >
+        <strong>LinkedIn: </strong>
+        <Link
+          href={profile.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          underline="none"
+          sx={{ display: "inline-flex", alignItems: "center" }}
+        >
+          {profile.linkedinName}{" "}
+          <OpenInNewIcon
+            sx={{ display: "inline-flex", alignItems: "center", fontSize: 13 }}
+          />
+        </Link>
+      </Typography>
+      <Typography
+        sx={{
+          fontFamily: "Tensor Sans",
+          marginTop: "40px",
+          marginBottom: "20px",
+          marginLeft: "120px",
+          textAlign: "left",
+          maxWidth: "80%",
+        }}
+      >
         <strong>
           Biography: <b></b>
         </strong>
         <div>{profile.biography}</div>
       </Typography>
+
       <Typography
         sx={{
           fontFamily: "Tensor Sans",
@@ -255,11 +374,37 @@ const ProfileInfoPopup = ({ profile, onClose }) => {
         <strong>
           SDG Interests: <b></b>
         </strong>
+
         <div>
           {" "}
-          <SDGImages researchInterests={profile.researchInterests} />
+          <SDGImages
+            researchInterests={profile.researchInterests}
+            showSdgTooltip={showSdgTooltip}
+            hideSdgTooltip={hideSdgTooltip}
+            sdgTooltip={sdgTooltip}
+          />
         </div>
       </Typography>
+
+      {sdgTooltip.show && (
+        <div
+          style={{
+            position: "fixed",
+            top: sdgTooltip.y - 190,
+            left: sdgTooltip.x,
+            maxWidth: "23ch",
+            backgroundColor: "white",
+            border: "1px solid #DDD",
+            borderRadius: "4px",
+            padding: "8px",
+            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
+            zIndex: 400,
+            justifyContent: "center",
+          }}
+        >
+          {sdgTooltip.text}
+        </div>
+      )}
     </div>
   );
 };
@@ -271,12 +416,41 @@ const ProfilePopup = ({
   emailCount,
   setEmailCount,
   maxEmails,
+  confirmMessage,
+  setConfirmMessage,
+
+  errorMessage,
+  setErrorMessage,
+
+  emailCounts,
 }) => {
   //State variables to keep track of the amount of emails sent to another user
 
   const { currentUser } = useAuth();
   const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);
   const senderEmail = profileofCurrentUser?.email; // Email of the current logged-in user
+
+  useEffect(() => {
+    async function fetchEmailCount() {
+      const emailCountsRef = doc(
+        db,
+        "emailCounts",
+        `${currentUser.uid}_${profile.id}`
+      );
+      const docSnap = await getDoc(emailCountsRef);
+
+      if (docSnap.exists()) {
+        setEmailCount(docSnap.data().count);
+      } else {
+        setEmailCount(0);
+      }
+    }
+
+    if (currentUser && profile) {
+      fetchEmailCount();
+    }
+  }, [currentUser, profile]);
+
   useEffect(() => {
     async function fetchProfileofCurrentUser() {
       if (currentUser) {
@@ -298,6 +472,7 @@ const ProfilePopup = ({
   if (!profile) return null;
 
   const sendEmail = (e) => {
+    console.log("Sending email...");
     e.preventDefault();
 
     if (emailCount >= maxEmails) {
@@ -306,8 +481,6 @@ const ProfilePopup = ({
       );
       return;
     }
-    console.log("Sender Email:", profileofCurrentUser?.email); // Print sender email
-    console.log("Receiver Email:", profile?.email); // Print receiver email
 
     emailjs
       .sendForm(
@@ -318,12 +491,41 @@ const ProfilePopup = ({
       )
       .then(
         (result) => {
-          console.log("Email sent result:", result.text); // This will print the result of sending the email
           e.target.reset();
-          setEmailCount(emailCount + 1);
+          const newCount = emailCount + 1;
+          setEmailCount(newCount);
+          if (newCount >= maxEmails) {
+            setErrorMessage({
+              text: "You have already contacted them three times. Please wait until they reply.",
+              show: true,
+            });
+            setTimeout(() => setErrorMessage({ text: "", show: false }), 8000);
+            onClose(); // Close the contact popup
+          } else {
+            setConfirmMessage({
+              text: `Email has been sent. You now have ${
+                maxEmails - newCount
+              } email(s) left.`,
+              show: true,
+            });
+            setTimeout(
+              () => setConfirmMessage({ text: "", show: false }),
+              5000
+            );
+          }
+          setTimeout(() => {
+            setConfirmMessage({ text: "", show: false });
+          }, 5000);
+          // Update the Firestore database with the new count
+          const emailCountsRef = doc(
+            db,
+            "emailCounts",
+            `${currentUser.uid}_${profile.id}`
+          );
+          setDoc(emailCountsRef, { count: newCount }, { merge: true });
         },
         (error) => {
-          console.log("Send email error:", error.text); // This will print the error if email sending fails
+          console.log("Send email error:", error.text);
         }
       );
   };
@@ -342,7 +544,7 @@ const ProfilePopup = ({
         bottom: 0,
         width: "75%",
         backgroundColor: "white",
-        zIndex: 1000,
+        zIndex: 300,
         overflowY: "auto",
         border: "1px solid #e0e0e0",
         boxShadow:
@@ -354,7 +556,7 @@ const ProfilePopup = ({
         style={{
           position: "absolute",
           top: 20,
-          left: 20,
+          left: 30,
           cursor: "pointer",
           width: "20px",
           height: "20px",
@@ -430,20 +632,7 @@ const ProfilePopup = ({
             </div>
           </div>
         </Typography>
-        {emailCount < maxEmails && (
-          <Typography
-            sx={{
-              fontFamily: "Tensor Sans",
-              marginTop: "20px",
-              textAlign: "left",
-              marginLeft: "150px",
-              marginBottom: "5px",
-              maxWidth: "80%",
-            }}
-          >
-            {remainingEmailsMessage(emailCount, maxEmails)}
-          </Typography>
-        )}
+       
 
         {/* Popup content */}
         <div>
@@ -511,16 +700,19 @@ const ProfilePopup = ({
 };
 
 export default function Researchers() {
+  const [confirmMessage, setConfirmMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [profiles, setProfiles] = useState([]);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const [contactProfile, setContactProfile] = useState(null);
+  const maxEmails = 3;
   // keep track of the emails sent to avoid spam
   const [emailCount, setEmailCount] = useState(0);
   const [emailCounts, setEmailCounts] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSDGs, setSelectedSDGs] = useState("");
   const [openFilter, setOpenFilter] = useState(false); // State to handle filter visibility
-  const maxEmails = 3;
 
   const handleCloseFilter = () => {
     setOpenFilter(false);
@@ -554,15 +746,17 @@ export default function Researchers() {
 
   const handleContactClick = (event, profile) => {
     event.stopPropagation();
-    setContactProfile(profile);
-    setSelectedProfile(null); // Close the profile info popup if it's open
-    if (!emailCount[profile.id]) {
-      setEmailCount({ ...emailCount, [profile.id]: 0 });
+    if (emailCounts[profile.id] >= maxEmails) {
+      setErrorMessage({
+        text: "You have already contacted them three times. You cannot contact them anymore.",
+        show: true,
+      });
+      setTimeout(() => setErrorMessage({ text: "", show: false }), 5000);
+      setContactProfile(null); // Close the contact popup
+    } else {
+      setContactProfile(profile);
+      setSelectedProfile(null);
     }
-    // setEmailCounts((prevCounts) => ({
-    //   ...prevCounts,
-    //   [profile.id]: prevCounts[profile.id] || 0,
-    // }));
   };
 
   //filter researchers by search query
@@ -636,8 +830,15 @@ export default function Researchers() {
   };
 
   return (
-    <div>
-      <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center">
+      <div>
+        {errorMessage.show && (
+          <div className="errorMessage">{errorMessage.text}</div>
+        )}
+
+        {confirmMessage.show && (
+          <div className="confirmMessage">{confirmMessage.text}</div>
+        )}
         <h2 className="researchers-title">Researchers</h2>
         <TextField // Search bar
           label="Search Researchers..."
@@ -745,7 +946,7 @@ export default function Researchers() {
                 boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
                 borderRadius: "50%",
                 marginTop: "70px",
-                // margin: "20px",
+
                 width: "150px",
                 height: "150px",
               }}
@@ -771,24 +972,27 @@ export default function Researchers() {
               </div>
               <div style={{ cursor: "pointer" }}>{profile.role}</div>
             </div>
-            <IconButton
-              onClick={(event) => handleContactClick(event, profile)}
-              className="noHoverEffect"
-              style={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-                cursor: "pointer",
-                fontFamily: "Tensor Sans",
-                color: "black",
-                fontSize: "16px",
-              }}
-            >
-              Contact{" "}
-              <EmailOutlinedIcon
-                style={{ color: "black", marginLeft: "5px" }}
-              />
-            </IconButton>
+
+            {(emailCounts[profile.id] + 1 || 0) <= maxEmails && (
+              <IconButton
+                onClick={(event) => handleContactClick(event, profile)}
+                className="noHoverEffect"
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  cursor: "pointer",
+                  fontFamily: "Tensor Sans",
+                  color: "black",
+                  fontSize: "16px",
+                }}
+              >
+                Contact{" "}
+                <EmailOutlinedIcon
+                  style={{ color: "black", marginLeft: "5px" }}
+                />
+              </IconButton>
+            )}
           </Paper>
         ))}
       </div>
@@ -802,6 +1006,8 @@ export default function Researchers() {
           <ProfileInfoPopup
             profile={selectedProfile}
             onClose={handleClosePopup}
+            handleContactClick={handleContactClick}
+            emailCounts={emailCounts}
           />
         </Modal>
       )}
@@ -820,6 +1026,11 @@ export default function Researchers() {
               setEmailCounts({ ...emailCounts, [contactProfile.id]: count })
             }
             maxEmails={maxEmails}
+            confirmMessage={confirmMessage}
+            setConfirmMessage={setConfirmMessage}
+            emailCounts={emailCounts}
+            errorMessage={errorMessage}
+            setErrorMessage={setErrorMessage}
           />
         </Modal>
       )}

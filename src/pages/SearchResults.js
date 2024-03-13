@@ -31,6 +31,7 @@ export default function SearchResults() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate(); // Hook for navigation
   const [tooltip, setTooltip] = useState({ show: false, text: "", x: 0, y: 0 });
+  
 
   const sdgTooltips = [
     "End poverty in all its forms everywhere.",
