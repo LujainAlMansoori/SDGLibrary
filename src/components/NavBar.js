@@ -36,7 +36,7 @@ export default function NavBar() {
     };
 
     fetchUserProfile();
-  }, [currentUser]);
+  }, [currentUser, location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -92,47 +92,62 @@ export default function NavBar() {
             <li style={{ marginRight: "10px" }}>
               <Link to="/SearchResults">Search</Link>
             </li>
-            {currentUser && (
-              <li style={{ marginRight: "10px" }}>
-                <Link to="/Researchers">Members</Link>
-              </li>
-            )}
+            {currentUser &&
+              userProfile &&
+              userProfile.role &&
+              userProfile.firstName &&
+              userProfile.lastName && (
+                <li style={{ marginRight: "10px" }}>
+                  <Link to="/Researchers">Members</Link>
+                </li>
+              )}
           </ul>
         </div>
         <div
           style={{ display: "flex", alignItems: "center", marginRight: "40px" }}
         >
-          {currentUser && userProfile ? (
+          {currentUser ? (
             <>
-              <img
-                src={
-                  userProfile.profileImage ||
-                  require("../components/assets/profile-photo.webp")
-                }
-                alt="Profile"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  border: "1px solid #5c5b5b",
-                  boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
-                  borderRadius: "50%",
-                  marginRight: "10px",
-                }}
-              />
-              <span style={{ marginRight: "10px" }}>
-                {userProfile.title} {userProfile.firstName}{" "}
-                {userProfile.lastName}
-              </span>
-              <MenuListComposition logout={logout} navigate={navigate} />{" "}
+              {userProfile ? (
+                <>
+                  <img
+                    src={
+                      userProfile.profileImage ||
+                      require("../components/assets/profile-photo.webp")
+                    }
+                    alt="Profile"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      border: "1px solid #5c5b5b",
+                      boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
+                      borderRadius: "50%",
+                      marginRight: "10px",
+                    }}
+                  />
+                  <span style={{ marginRight: "10px" }}>
+                    {userProfile.title} {userProfile.firstName}{" "}
+                    {userProfile.lastName}
+                  </span>
+                  <MenuListComposition logout={logout} navigate={navigate} />{" "}
+                </>
+              ) : (
+                <Typography
+                  onClick={handleLogout}
+                  style={{ cursor: "pointer", marginRight: "10px" }}
+                >
+                  Log Out
+                </Typography>
+              )}
             </>
-          ) : location.pathname === "/createprofile" ? (
-            <li style={{ marginRight: "10px" }}>
-              <Typography onClick={handleLogout}>Log Out</Typography>
-            </li>
           ) : (
-            <li style={{ marginRight: "10px" }}>
-              <Link to="/Signup">Sign In</Link>
-            </li>
+            <Link
+              to="/Signup"
+              className="nav-link"
+              style={{ marginRight: "10px" }}
+            >
+              Sign In
+            </Link>
           )}
         </div>
       </nav>

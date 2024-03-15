@@ -36,7 +36,6 @@ import { useAuth } from "../contexts/AuthContexts";
 export default function CreateProfile() {
   const location = useLocation();
   const [formValues, setFormValues] = useState({
-   
     title: "",
     firstName: "",
     lastName: "",
@@ -130,6 +129,16 @@ export default function CreateProfile() {
     profileImageInputRef.current.click();
   };
 
+  useEffect(() => {
+    if (location.state?.showProfileAlert) {
+      setErrorMessage({
+        text: "You must create an account before viewing members.",
+        show: true,
+      });
+      setTimeout(() => setErrorMessage({ text: "", show: false }), 5000);
+    }
+  }, [location.state?.showProfileAlert]);
+
   // This gets the user's SDGs
   const handleSDGChange = (event) => {
     if (event.target.checked) {
@@ -142,10 +151,6 @@ export default function CreateProfile() {
     event.preventDefault();
     // Profile image  URL
     let profileImageUrl = "";
-    // Validation checks
-    //  if (PasswordRef.current.value !== ConfirmPasswordRef.current.value) {
-    //  return setError("Passwords Do Not Match.");
-    //  }
 
     // Editing the user's information to include fields from create profile
     if (!currentUser) {
@@ -176,21 +181,23 @@ export default function CreateProfile() {
       researchInterests: selectedSDGs,
       profileImage: profileImageUrl,
       email: currentUser.email,
-      accountRole: 'member'
+      accountRole: "member",
     };
 
     try {
-      // TODO: error message
       setError("");
       setLoading(true);
-      // Set the document in the 'profiles' collection with the user's UID as the document ID
       await setDoc(doc(db, "profiles", currentUser.uid), userProfile);
-      navigate("/researchers");
       setConfirmMessage({
         text: "Successfully created profile.",
         show: true,
       });
-      setTimeout(() => setConfirmMessage({ text: "", show: false }), 5000);
+      setTimeout(() => {
+        setConfirmMessage({ text: "", show: false });
+        navigate("/researchers", {
+          state: { success: "Successfully created profile." },
+        });
+      }, 5000);
     } catch (error) {
       console.error("Error writing document: ", error);
       setErrorMessage({
@@ -223,11 +230,11 @@ export default function CreateProfile() {
       <Paper
         elevation={4}
         sx={{
-          mt: 7,
+          mt: 14,
           backgroundColor: "white",
           width: 700,
           marginLeft: "23%",
-          height: 830,
+          height: 900,
           padding: 2,
           justifyContent: "center",
           alignItems: "center",

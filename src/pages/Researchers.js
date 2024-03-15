@@ -4,8 +4,10 @@ import { collection, getDocs } from "firebase/firestore";
 import Paper from "@mui/material/Paper";
 import "../components/style/titles.css";
 import IconButton from "@mui/material/IconButton";
+import { useLocation } from "react-router-dom";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import "../components/style/noHover.css";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import emailjs from "emailjs-com";
 import { useAuth } from "../contexts/AuthContexts";
 import { Typography, Link } from "@mui/material";
@@ -22,7 +24,12 @@ import Modal from "@mui/material/Modal";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import InfoIcon from "@mui/icons-material/Info";
 import { setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+
 import "../components/style/ErrorMessages.css";
+
+import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
 
 const remainingEmailsMessage = (emailCount, maxEmails) => {
   if (emailCount < maxEmails) {
@@ -238,25 +245,75 @@ const ProfileInfoPopup = ({
       >
         X
       </button>
-      {emailCounts[`${currentUser?.uid}_${profile?.id}`] < maxEmails && (
+
+      {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 < maxEmails ? (
         <IconButton
           onClick={(event) => handleContactClick(event, profile)}
           className="noHoverEffect"
           style={{
             position: "absolute",
-            top: "20px",
+            top: "10px",
             right: "10px",
             cursor: "pointer",
             fontFamily: "Tensor Sans",
             color: "black",
             fontSize: "16px",
-            marginRight: "60px",
+            backgroundColor: "transparent",
+            ":hover": {
+              backgroundColor: "transparent",
+              boxShadow: "none",
+            },
           }}
         >
           Contact{" "}
-          <EmailOutlinedIcon style={{ color: "black", marginLeft: "5px" }} />
+          <EmailOutlinedIcon
+            sx={{
+              color: "black",
+              marginLeft: "5px",
+              ":hover": {
+                backgroundColor: "transparent",
+              },
+            }}
+          />
+        </IconButton>
+      ) : (
+        <IconButton
+          sx={{
+            color: "grey",
+            marginLeft: "5px",
+            ":hover": {
+              backgroundColor: "transparent",
+            },
+          }}
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            cursor: "not-allowed",
+            fontFamily: "Tensor Sans",
+            color: "grey",
+            // Remove any box-shadow or border that might appear on hover
+            "&:hover": {
+              backgroundColor: "transparent",
+              boxShadow: "none",
+              border: "none",
+            },
+            fontSize: "16px",
+          }}
+        >
+          Contact{" "}
+          <EmailOutlinedIcon
+            sx={{
+              color: "grey",
+              marginLeft: "5px",
+              ":hover": {
+                backgroundColor: "transparent",
+              },
+            }}
+          />
         </IconButton>
       )}
+
       <div
         style={{
           display: "flex",
@@ -717,6 +774,12 @@ const ProfilePopup = ({
 };
 
 export default function Researchers() {
+  const location = useLocation();
+  const [showProfileAlert, setShowProfileAlert] = useState(false);
+
+  const navigate = useNavigate();
+
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showContactButton, setShowContactButton] = useState({});
 
   const { currentUser } = useAuth();
@@ -737,6 +800,57 @@ export default function Researchers() {
   const handleCloseFilter = () => {
     setOpenFilter(false);
   };
+
+  useEffect(() => {
+    async function checkUserProfile() {
+      if (currentUser) {
+        const docRef = doc(db, "profiles", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        if (
+          !docSnap.exists() ||
+          !docSnap.data().firstName ||
+          !docSnap.data().lastName ||
+          !docSnap.data().role
+        ) {
+          navigate("/createprofile", { state: { from: "researchers" } });
+          setShowProfileAlert(true);
+        }
+      }
+    }
+
+    checkUserProfile();
+  }, [currentUser, navigate]);
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (currentUser) {
+        const docRef = doc(db, "profiles", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        if (
+          !docSnap.exists() ||
+          !docSnap.data().firstName ||
+          !docSnap.data().lastName ||
+          !docSnap.data().role
+        ) {
+          navigate("/createprofile", {
+            state: { from: "researchers", showProfileAlert: true },
+          });
+        }
+      }
+    };
+
+    checkUserProfile();
+  }, [currentUser, navigate]);
+
+  useEffect(() => {
+    if (location.state?.success) {
+      setShowSuccessMessage(true);
+      const timer = setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000); // 5000 milliseconds = 5 seconds
+
+      return () => clearTimeout(timer); // Clean up the timer when the component unmounts
+    }
+  }, [location.state?.success]);
   useEffect(() => {
     const fetchProfiles = async () => {
       const profilesCollection = collection(db, "profiles");
@@ -884,230 +998,328 @@ export default function Researchers() {
     setShowContactButton(initialButtonVisibility);
   }, [profiles, currentUser]);
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div>
-        {errorMessage.show && (
-          <div className="errorMessage">{errorMessage.text}</div>
-        )}
+    <div>
+      {showSuccessMessage && (
+        <div className="confirmMessage">
+          <Typography>{location.state.success}</Typography>
+        </div>
+      )}
+      <div className="flex flex-col items-center justify-center">
+        <div>
+          {errorMessage.show && (
+            <div className="errorMessage">{errorMessage.text}</div>
+          )}
 
-        {confirmMessage.show && (
-          <div className="confirmMessage">{confirmMessage.text}</div>
-        )}
-        <h2 className="researchers-title">SDGLibrary Members</h2>
-        <TextField // Search bar
-          label="Search Researchers..."
-          variant="outlined"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            margin: "10px 10px",
-            marginLeft: "40px",
-            width: 1250,
-          }}
-          sx={{
-            borderRadius: "20px",
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "25px",
-            },
-          }}
-        />
-        <Button
-          onClick={() => setOpenFilter(true)}
-          sx={{
-            marginRight: "30px",
-            fontSize: "0.8rem",
-          }}
-        >
-          Filter
-        </Button>
-        <Modal
-          open={openFilter}
-          onClose={handleCloseFilter}
-          sx={{
-            //Drop down box for SDG filter
-            display: "flex",
-            justifyContent: "right",
-            alignItems: "center",
-            marginRight: "60px",
-            marginTop: "-80px",
-          }}
-          BackdropProps={{ style: { backgroundColor: "transparent" } }}
-        >
-          <Box
-            sx={{
-              width: 430, // Width of the dropdown
-              maxHeight: 230,
-              overflowY: "auto", // Make it scrollable
-              bgcolor: "background.paper",
-              p: 2,
-              border: "1px solid #c4c4c4",
-              borderRadius: "10px", // Make it rounded
-              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
-            }}
-          >
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Button
-                onClick={clearSDGSelection}
-                sx={{
-                  fontSize: "0.8rem",
-                  marginBottom: "-20px",
-                  marginLeft: 45, // Align the button to the right
-                }}
-              >
-                Clear
-              </Button>
-            </Box>
-            <FormGroup>
-              {sdglist.map((sdg) => (
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={selectedSDGs.includes(sdg)}
-                      onChange={handleSDGChange}
-                      value={sdg}
-                    />
-                  }
-                  label={sdg}
-                  key={sdg}
-                  sx={{ fontSize: "0.8rem" }} // Smaller font size
-                />
-              ))}
-            </FormGroup>
-          </Box>
-        </Modal>
-      </div>
-      <div style={{ display: "flex", flexWrap: "wrap", cursor: "pointer" }}>
-        {filteredProfiles.map((profile, index) => (
-          <Paper
-            key={index}
-            elevation={3}
+          {confirmMessage.show && (
+            <div className="confirmMessage">{confirmMessage.text}</div>
+          )}
+          <h2 className="researchers-title">SDGLibrary Members</h2>
+
+          <div
             style={{
-              ...paperStyle,
+              marginBottom: "60px",
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              position: "relative",
+              justifyContent: "center",
             }}
-            onClick={() => handleProfileClick(profile)}
           >
-            <img
-              src={
-                profile.profileImage ||
-                require("../components/assets/profile-photo.webp")
-              }
+            <TextField // Search bar
+              label="Search Researchers..."
+              variant="outlined"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               style={{
-                border: "0.5px solid #393939",
-                boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
-                borderRadius: "50%",
-                marginTop: "70px",
-
-                width: "150px",
-                height: "150px",
+                width: 900,
+                marginTop: "-20px",
+                marginBottom: "40px",
+              }}
+              sx={{
+                borderRadius: "20px",
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "25px",
+                },
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton>
+                      <SearchIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
               }}
             />
-            <div style={{ textAlign: "center", padding: "10px" }}>
-              <div
+            <Button
+              onClick={() => setOpenFilter(true)}
+              sx={{
+                marginRight: "30px",
+                fontSize: "1rem",
+                color: "#464646",
+                marginTop: "-70px",
+                "&:hover": {
+                  backgroundColor: "transparent", // Set the background color to transparent on hover
+                  boxShadow: "none", // Remove any box shadow on hover
+                },
+                "&:focus": {
+                  backgroundColor: "transparent", // Remove the outline on focus
+                },
+              }}
+            >
+              <FilterListIcon sx={{ fontSize: "2rem" }} />
+            </Button>
+          </div>
+          <Modal
+            open={openFilter}
+            onClose={handleCloseFilter}
+            sx={{
+              //Drop down box for SDG filter
+              display: "flex",
+              justifyContent: "right",
+              alignItems: "center",
+              marginRight: "60px",
+              marginTop: "-20px",
+            }}
+            BackdropProps={{ style: { backgroundColor: "transparent" } }}
+          >
+            <Box
+              sx={{
+                width: 430, // Width of the dropdown
+                maxHeight: 230,
+                overflowY: "auto", // Make it scrollable
+                bgcolor: "background.paper",
+                p: 2,
+                border: "1px solid #c4c4c4",
+                borderRadius: "10px", // Make it rounded
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+              }}
+            >
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Button
+                  onClick={clearSDGSelection}
+                  sx={{
+                    fontSize: "0.8rem",
+                    marginBottom: "-20px",
+                    marginLeft: 45, // Align the button to the right
+                  }}
+                >
+                  Clear
+                </Button>
+              </Box>
+              <FormGroup>
+                {sdglist.map((sdg) => (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={selectedSDGs.includes(sdg)}
+                        onChange={handleSDGChange}
+                        value={sdg}
+                      />
+                    }
+                    label={sdg}
+                    key={sdg}
+                    sx={{ fontSize: "0.8rem" }} // Smaller font size
+                  />
+                ))}
+              </FormGroup>
+            </Box>
+          </Modal>
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", cursor: "pointer" }}>
+          {filteredProfiles.map((profile, index) => (
+            <Paper
+              key={index}
+              elevation={3}
+              style={{
+                ...paperStyle,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                position: "relative",
+              }}
+              onClick={() => handleProfileClick(profile)}
+            >
+              <img
+                src={
+                  profile.profileImage ||
+                  require("../components/assets/profile-photo.webp")
+                }
                 style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                  marginTop: "-150px",
-                  fontSize: "18px",
+                  border: "0.5px solid #393939",
+                  boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
+                  borderRadius: "50%",
+                  marginTop: "70px",
+
+                  width: "150px",
+                  height: "150px",
                 }}
-              >
-                <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
-                  {profile.title}
-                </div>
+              />
+              <div style={{ textAlign: "center", padding: "10px" }}>
                 <div
-                  style={{ marginLeft: "5px", marginBottom: "5px" }}
-                >{`${profile.firstName} ${profile.lastName}`}</div>
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    marginTop: "-150px",
+                    fontSize: "18px",
+                  }}
+                >
+                  <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
+                    {profile.title}
+                  </div>
+                  <div
+                    style={{ marginLeft: "5px", marginBottom: "5px" }}
+                  >{`${profile.firstName} ${profile.lastName}`}</div>
+                </div>
+
+                <div style={{ cursor: "pointer" }}>{profile.role}</div>
               </div>
 
-              <div style={{ cursor: "pointer" }}>{profile.role}</div>
-            </div>
+              {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 <=
+                maxEmails && showContactButton[profile.id] !== false ? (
+                <IconButton
+                  onClick={(event) => handleContactClick(event, profile)}
+                  className="noHoverEffect"
+                  sx={{
+                    ":hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    cursor: "pointer",
+                    fontFamily: "Tensor Sans",
+                    color: "black",
 
-            {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 <=
-              maxEmails && showContactButton[profile.id] !== false ? (
-              <IconButton
-                onClick={(event) => handleContactClick(event, profile)}
-                className="noHoverEffect"
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  cursor: "pointer",
-                  fontFamily: "Tensor Sans",
-                  color: "black",
-                  fontSize: "16px",
-                }}
-              >
-                Contact{" "}
-                <EmailOutlinedIcon
-                  style={{ color: "black", marginLeft: "5px" }}
-                />
-              </IconButton>
-            ) : (
-              <IconButton
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  cursor: "not-allowed",
-                  fontFamily: "Tensor Sans",
-                  color: "grey",
-                  fontSize: "16px",
-                }}
-              >
-                Contact{" "}
-                <EmailOutlinedIcon
-                  style={{ color: "grey", marginLeft: "5px" }} // Apply grey color to the icon
-                />
-              </IconButton>
-            )}
-          </Paper>
-        ))}
+                    fontSize: "16px",
+                    // Remove any box-shadow or border that might appear on hover
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                      boxShadow: "none",
+                      border: "none",
+                    },
+                  }}
+                >
+                  Contact{" "}
+                  <EmailOutlinedIcon
+                    sx={{
+                      ":hover": {
+                        backgroundColor: "transparent",
+                      },
+                    }}
+                    style={{
+                      color: "black",
+                      marginLeft: "5px",
+                      // Remove any box-shadow or border that might appear on hover
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                        boxShadow: "none",
+                        border: "none",
+                      },
+                    }}
+                  />
+                </IconButton>
+              ) : (
+                <IconButton
+                  sx={{
+                    ":focus": {
+                      backgroundColor: "transparent",
+                      boxShadow: "none",
+                    },
+                    ":active": {
+                      backgroundColor: "transparent",
+                      boxShadow: "none",
+                    },
+                    ":hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    cursor: "not-allowed",
+                    fontFamily: "Tensor Sans",
+                    color: "grey",
+                    fontSize: "16px",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                  }}
+                >
+                  Contact{" "}
+                  <EmailOutlinedIcon
+                    sx={{
+                      backgroundColor: "transparent",
+                      color: "grey",
+                      marginLeft: "5px",
+                      ":hover": {
+                        backgroundColor: "transparent",
+                      },
+                      ":focus": {
+                        backgroundColor: "transparent",
+                        boxShadow: "none",
+                      },
+                      ":active": {
+                        backgroundColor: "transparent",
+                        boxShadow: "none",
+                      },
+                    }}
+                    style={{
+                      color: "grey",
+                      marginLeft: "5px",
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                      },
+                    }}
+                  />
+                </IconButton>
+              )}
+            </Paper>
+          ))}
+        </div>
+
+        {selectedProfile && (
+          <Modal
+            open={selectedProfile}
+            onClose={handleClosePopup}
+            BackdropProps={{ style: { backgroundColor: "transparent" } }}
+          >
+            <ProfileInfoPopup
+              profile={selectedProfile}
+              onClose={handleClosePopup}
+              handleContactClick={handleContactClick}
+              emailCounts={emailCounts}
+            />
+          </Modal>
+        )}
+
+        {contactProfile && (
+          <Modal
+            open={contactProfile}
+            onClose={handleClosePopup}
+            BackdropProps={{ style: { backgroundColor: "transparent" } }}
+          >
+            <ProfilePopup
+              profile={contactProfile}
+              onClose={handleClosePopup}
+              emailCount={emailCounts[contactProfile.id] || 0}
+              setEmailCount={(count) =>
+                setEmailCounts({ ...emailCounts, [contactProfile.id]: count })
+              }
+              maxEmails={maxEmails}
+              confirmMessage={confirmMessage}
+              setConfirmMessage={setConfirmMessage}
+              emailCounts={emailCounts}
+              errorMessage={errorMessage}
+              setErrorMessage={setErrorMessage}
+              setShowContactButton={setShowContactButton}
+            />
+          </Modal>
+        )}
       </div>
-
-      {selectedProfile && (
-        <Modal
-          open={selectedProfile}
-          onClose={handleClosePopup}
-          BackdropProps={{ style: { backgroundColor: "transparent" } }}
-        >
-          <ProfileInfoPopup
-            profile={selectedProfile}
-            onClose={handleClosePopup}
-            handleContactClick={handleContactClick}
-            emailCounts={emailCounts}
-          />
-        </Modal>
-      )}
-
-      {contactProfile && (
-        <Modal
-          open={contactProfile}
-          onClose={handleClosePopup}
-          BackdropProps={{ style: { backgroundColor: "transparent" } }}
-        >
-          <ProfilePopup
-            profile={contactProfile}
-            onClose={handleClosePopup}
-            emailCount={emailCounts[contactProfile.id] || 0}
-            setEmailCount={(count) =>
-              setEmailCounts({ ...emailCounts, [contactProfile.id]: count })
-            }
-            maxEmails={maxEmails}
-            confirmMessage={confirmMessage}
-            setConfirmMessage={setConfirmMessage}
-            emailCounts={emailCounts}
-            errorMessage={errorMessage}
-            setErrorMessage={setErrorMessage}
-            setShowContactButton={setShowContactButton}
-          />
-        </Modal>
-      )}
     </div>
   );
 }
