@@ -35,7 +35,7 @@ export default function NewMaterial() {
     link: "",
     category: "",
     publisher: "",
-    journalName: "",
+
     institution: "",
     tags: [],
   });
@@ -56,6 +56,28 @@ export default function NewMaterial() {
         [name]: value,
       });
     }
+  };
+
+  const isFormValid = () => {
+    const requiredFields = [
+      "title",
+      "author",
+      "category",
+      "institution",
+      "publisher",
+      "date_published",
+      "description",
+      "link",
+      "fileName",
+    ];
+
+    if (materialDetails.category === "Journal") {
+      requiredFields.push("journalName");
+    }
+
+    return requiredFields.every(
+      (field) => materialDetails[field] && materialDetails[field].trim() !== ""
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -217,17 +239,18 @@ export default function NewMaterial() {
                   onChange={handleChange}
                 />
               </Grid>
-              {/* Journal Name field */}
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="journalName"
-                  label="Journal Name"
-                  value={materialDetails.journalName}
-                  onChange={handleChange}
-                />
-              </Grid>
+              {materialDetails.category === "Journal" && (
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="journalName"
+                    label="Journal Name"
+                    value={materialDetails.journalName}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              )}
 
               <Grid item xs={12}>
                 <TextField
@@ -295,6 +318,7 @@ export default function NewMaterial() {
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
+                  disabled={!isFormValid()}
                 >
                   Submit
                 </Button>
