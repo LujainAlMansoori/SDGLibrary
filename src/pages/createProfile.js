@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -18,7 +18,6 @@ import Paper from "@mui/material/Paper";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
-import { useLocation } from "react-router-dom";
 
 import {
   uploadBytes,
@@ -35,6 +34,63 @@ import { doc, setDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContexts";
 
 export default function CreateProfile() {
+  const location = useLocation();
+  const [formValues, setFormValues] = useState({
+   
+    title: "",
+    firstName: "",
+    lastName: "",
+    role: "",
+    linkedinName: "",
+    linkedin: "",
+    biography: "",
+    currentProjects: "",
+  });
+
+  const [linkError, setLinkError] = useState("");
+
+  const [confirmMessage, setConfirmMessage] = useState({
+    text: "",
+    show: false,
+  });
+  const [errorMessage, setErrorMessage] = useState({ text: "", show: false });
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    if (name === "linkedin") {
+      const urlPattern =
+        /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
+      if (value && !urlPattern.test(value)) {
+        setLinkError("Add a valid link.");
+      } else {
+        setLinkError("");
+      }
+    }
+
+    setFormValues({ ...formValues, [name]: value });
+  };
+
+  const isFormValid = () => {
+    return (
+      Object.values(formValues).every((value) => value.trim() !== "") &&
+      selectedSDGs.length > 0 &&
+      linkError === ""
+    );
+  };
+
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.success) {
+      setShowSuccessMessage(true);
+      const timer = setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000); // 5000 milliseconds = 5 seconds
+
+      return () => clearTimeout(timer); // Clean up the timer when the component unmounts
+    }
+  }, [location.state?.success]);
+
   const { currentUser } = useAuth(); // Get the current user from the AuthContext
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -43,22 +99,6 @@ export default function CreateProfile() {
   const [selectedSDGs, setSelectedSDGs] = useState([]);
   const [profileImage, setProfileImage] = useState(null); // State for the profile image
   const profileImageInputRef = useRef(null); // Ref for the file input
-  const location = useLocation();
-  const [successMessage, setSuccessMessage] = useState(
-    location.state?.success || ""
-  );
-
-  useEffect(() => {
-    if (successMessage) {
-    
-      const timer = setTimeout(() => {
-        setSuccessMessage("");
-      }, 5000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage]);
-
   const sdglist = [
     "SDG1 - No Poverty",
     "SDG2 - Zero Hunger",
@@ -136,6 +176,7 @@ export default function CreateProfile() {
       researchInterests: selectedSDGs,
       profileImage: profileImageUrl,
       email: currentUser.email,
+      accountRole: 'member'
     };
 
     try {
@@ -145,25 +186,48 @@ export default function CreateProfile() {
       // Set the document in the 'profiles' collection with the user's UID as the document ID
       await setDoc(doc(db, "profiles", currentUser.uid), userProfile);
       navigate("/researchers");
-      console.log("Profile created successfully");
+      setConfirmMessage({
+        text: "Successfully created profile.",
+        show: true,
+      });
+      setTimeout(() => setConfirmMessage({ text: "", show: false }), 5000);
     } catch (error) {
-      console.error("Error creating profile:", error);
-      setError("Failed to Create a Profile.");
+      console.error("Error writing document: ", error);
+      setErrorMessage({
+        text: "Failed to create profile.",
+        show: true,
+      });
+      setTimeout(() => setErrorMessage({ text: "", show: false }), 5000);
     }
     setLoading(false);
   }
 
   return (
     <div>
-      {successMessage && <div className="confirmMessage">{successMessage}</div>}
+      {showSuccessMessage && (
+        <div className="confirmMessage">
+          <Typography>{location.state.success}</Typography>
+        </div>
+      )}
+
+      {confirmMessage.show && (
+        <div className="confirmMessage">
+          <Typography>{confirmMessage.text}</Typography>
+        </div>
+      )}
+      {errorMessage.show && (
+        <div className="errorMessage">
+          <Typography>{errorMessage.text}</Typography>
+        </div>
+      )}
       <Paper
         elevation={4}
         sx={{
-          mt: 17,
+          mt: 7,
           backgroundColor: "white",
           width: 700,
           marginLeft: "23%",
-          height: 1000,
+          height: 830,
           padding: 2,
           justifyContent: "center",
           alignItems: "center",
@@ -187,7 +251,19 @@ export default function CreateProfile() {
               alignItems: "center",
             }}
           >
-            <h2 className="researchers-title">Create Your Profile </h2>
+            <Typography
+              component="h1"
+              variant="h4"
+              sx={{ fontFamily: "Tenor Sans" }}
+            >
+              Create Your Profile
+            </Typography>
+
+            {error && (
+              <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+                {error}
+              </Alert>
+            )}
 
             <Box
               component="form"
@@ -207,7 +283,9 @@ export default function CreateProfile() {
                           labelId="demo-simple-select-label"
                           id="demo-simple-select"
                           name="title"
+                          value={formValues.title}
                           label="Title"
+                          onChange={handleChange}
                           sx={{
                             "& .MuiOutlinedInput-root": {
                               "&.Mui-focused fieldset": {
@@ -228,6 +306,8 @@ export default function CreateProfile() {
                         required
                         fullWidth
                         name="firstName"
+                        value={formValues.firstName}
+                        onChange={handleChange}
                         label="First Name"
                         autoComplete="given-name"
                         sx={{
@@ -246,6 +326,8 @@ export default function CreateProfile() {
                         fullWidth
                         name="lastName"
                         label="Last Name"
+                        value={formValues.lastName}
+                        onChange={handleChange}
                         autoComplete="family-name"
                         sx={{
                           "& .MuiOutlinedInput-root": {
@@ -262,6 +344,8 @@ export default function CreateProfile() {
                         fullWidth
                         name="role"
                         label="Role"
+                        value={formValues.role}
+                        onChange={handleChange}
                         autoComplete="role"
                         sx={{
                           "& .MuiOutlinedInput-root": {
@@ -315,6 +399,8 @@ export default function CreateProfile() {
                     fullWidth
                     name="linkedinName"
                     label="LinkedIn Username"
+                    value={formValues.likedinName}
+                    onChange={handleChange}
                     multiline
                     rows={1}
                     autoComplete="linkedinName"
@@ -334,8 +420,12 @@ export default function CreateProfile() {
                     fullWidth
                     name="linkedin"
                     label="Link to LinkedIn"
+                    value={formValues.linkedin}
+                    onChange={handleChange}
                     multiline
                     rows={1}
+                    error={Boolean(linkError)}
+                    helperText={linkError}
                     autoComplete="linkedin"
                     sx={{
                       "& .MuiOutlinedInput-root": {
@@ -353,6 +443,8 @@ export default function CreateProfile() {
                     fullWidth
                     name="biography"
                     label="Biography"
+                    value={formValues.biography}
+                    onChange={handleChange}
                     multiline
                     rows={4}
                     autoComplete="biography"
@@ -375,6 +467,8 @@ export default function CreateProfile() {
                     rows={4}
                     name="currentProjects"
                     label="Current Projects"
+                    value={formValues.currentProjects}
+                    onChange={handleChange}
                     autoComplete="current-projects"
                     sx={{
                       "& .MuiOutlinedInput-root": {
@@ -428,7 +522,7 @@ export default function CreateProfile() {
               </Grid>
               <Grid container justifyContent="center" sx={{ mt: 3, mb: 2 }}>
                 <Button
-                  // disabled={loading}
+                  disabled={!isFormValid()}
                   type="submit"
                   variant="contained"
                   sx={{ mt: 3, mb: 2, width: 400 }}

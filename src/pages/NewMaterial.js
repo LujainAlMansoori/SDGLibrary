@@ -116,8 +116,20 @@ export default function NewMaterial() {
   const [errorMessage, setErrorMessage] = useState({ text: "", show: false });
 
   const [isLoadingTags, setIsLoadingTags] = useState(true);
+  const [linkError, setLinkError] = useState("");
 
   const handleChange = async (e) => {
+    const { name, value } = e.target;
+    if (name === "link") {
+      const urlPattern =
+        /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
+      if (value && !urlPattern.test(value)) {
+        setLinkError("Add a valid link.");
+      } else {
+        setLinkError("");
+      }
+    }
+
     if (e.target.type === "file") {
       const newFile = e.target.files[0];
       if (newFile) {
@@ -131,6 +143,8 @@ export default function NewMaterial() {
         }
         // Check if newFile is defined
         setFile(newFile);
+        const { name, value } = e.target;
+
         setMaterialDetails({
           ...materialDetails,
           fileName: newFile.name, // Access name property safely
@@ -156,6 +170,7 @@ export default function NewMaterial() {
           tags: [...materialDetails.tags, tagInput.trim()],
         });
       }
+
       setTagInput(""); // Clear input field
     } else {
       const { name, value } = e.target;
@@ -183,9 +198,11 @@ export default function NewMaterial() {
       requiredFields.push("journalName");
     }
 
-    return requiredFields.every(
+    const fieldsValid = requiredFields.every(
       (field) => materialDetails[field] && materialDetails[field].trim() !== ""
     );
+
+    return fieldsValid && linkError === "";
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -246,7 +263,7 @@ export default function NewMaterial() {
     } catch (error) {
       console.error("Error writing document: ", error);
       setErrorMessage({
-        text: "Cannot add material to SDGLibrary.",
+        text: "Failed to add material to SDGLibrary.",
         show: true,
       });
       setTimeout(() => setErrorMessage({ text: "", show: false }), 5000);
@@ -414,6 +431,8 @@ export default function NewMaterial() {
                     label="Link"
                     value={materialDetails.link}
                     onChange={handleChange}
+                    error={Boolean(linkError)}
+                    helperText={linkError}
                   />
                 </Grid>
                 {/* Upload File field */}

@@ -539,6 +539,11 @@ const ProfilePopup = ({
         },
         (error) => {
           console.log("Send email error:", error.text);
+          setErrorMessage({
+            text: "Failed to send email.",
+            show: true,
+          });
+          setTimeout(() => setErrorMessage({ text: "", show: false }), 5000);
         }
       );
   };
@@ -741,13 +746,15 @@ export default function Researchers() {
           id: doc.id,
           ...doc.data(),
         }))
+
+        .filter((profile) => profile.id !== currentUser.uid) // Filter out the current user's profile
         .sort((a, b) => a.firstName.localeCompare(b.firstName));
 
       setProfiles(profilesList);
     };
 
     fetchProfiles();
-  }, []);
+  }, [currentUser]);
 
   const fetchEmailCount = async (userId, profileId) => {
     const emailCountsRef = doc(db, "emailCounts", `${userId}_${profileId}`);
@@ -886,7 +893,7 @@ export default function Researchers() {
         {confirmMessage.show && (
           <div className="confirmMessage">{confirmMessage.text}</div>
         )}
-        <h2 className="researchers-title">Researchers</h2>
+        <h2 className="researchers-title">SDGLibrary Members</h2>
         <TextField // Search bar
           label="Search Researchers..."
           variant="outlined"

@@ -305,6 +305,17 @@ function SearchPage() {
         />
       </div>
       <div>
+        {/* Display message if no results found */}
+        {searchQuery && results.length === 0 && (
+          <div style={{ marginTop: "20px", textAlign: "center" }}>
+            <Typography
+              variant="body1"
+              style={{ marginLeft: "30px", marginTop: "20px", color: "black" }}
+            >
+              No material with this research result.
+            </Typography>
+          </div>
+        )}
         {results.map((result, index) => (
           <Paper
             key={index}
