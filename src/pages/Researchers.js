@@ -1018,13 +1018,6 @@ export default function Researchers() {
                 >{`${profile.firstName} ${profile.lastName}`}</div>
               </div>
 
-              <div style={{ marginLeft: "5px", marginBottom: "5px" }}>
-                {`Emails: ${
-                  emailCounts[`${currentUser?.uid}_${profile?.id}`] ||
-                  "Loading..."
-                }`}
-              </div>
-
               <div style={{ cursor: "pointer" }}>{profile.role}</div>
             </div>
 
