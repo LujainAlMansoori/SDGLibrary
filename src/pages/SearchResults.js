@@ -1,5 +1,7 @@
 // This is the page when they first enter the searching section
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
+import InfoIcon from "@mui/icons-material/Info";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import Paper from "@mui/material/Paper";
@@ -27,11 +29,17 @@ import Modal from "@mui/material/Modal";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
 export default function SearchResults() {
+  const tooltipTimeoutRef = useRef(null);
+
   const [materials, setMaterials] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [modal, setModal] = useState({ open: false, content: "" });
   const navigate = useNavigate(); // Hook for navigation
-  const [tooltip, setTooltip] = useState({ show: false, text: "", x: 0, y: 0 });
-  
+  const [tooltip, setTooltip] = useState({
+    show: false,
+    text: "",
+    anchorEl: null,
+  });
 
   const sdgTooltips = [
     "End poverty in all its forms everywhere.",
@@ -72,6 +80,26 @@ export default function SearchResults() {
     "SDG16 - Peace, Justice and Strong Institutions",
     "SDG17 - Partnerships for the Goals",
   ];
+
+  const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+  };
+
+  const handleModalOpen = (content) => {
+    setModal({ open: true, content });
+  };
+
+  const handleModalClose = () => {
+    setModal({ open: false, content: "" });
+  };
 
   const sdgImages = Array.from(
     { length: 17 },
@@ -120,19 +148,47 @@ export default function SearchResults() {
     );
   });
 
+  const handleTooltipToggle = (index, e) => {
+    if (tooltip.show && tooltip.index === index) {
+      setTooltip({ show: false, text: "", index: null, anchorEl: null });
+    } else {
+      setTooltip({
+        show: true,
+        text: sdgTooltips[index],
+        index,
+        anchorEl: e.currentTarget,
+      });
+    }
+  };
+
+  const handleClickAway = () => {
+    if (tooltip.show) {
+      setTooltip({ show: false, text: "", index: null, anchorEl: null });
+    }
+  };
+
   const showTooltip = (index, e) => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
     const rect = e.target.getBoundingClientRect();
     const x = rect.left + window.scrollX + rect.width / 2;
-    const y = rect.top + window.scrollY - 10; // Adjust to position above the SDG image
-    setTooltip({
-      show: true,
-      text: sdgTooltips[index],
-      x,
-      y,
-    });
+    const y = rect.top + window.scrollY - 10;
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setTooltip({
+        show: true,
+        text: sdgTooltips[index],
+        x,
+        y,
+      });
+    }, 150); // Adjust the delay as needed
   };
 
   const hideTooltip = () => {
+    console.log("hidden");
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
     setTooltip({ show: false, text: "", x: 0, y: 0 });
   };
 
@@ -175,27 +231,9 @@ export default function SearchResults() {
             }}
           />
         </div>
-        {tooltip.show && (
-          <div
-            style={{
-              position: "absolute",
-              top: `${tooltip.y + 120}px`,
-              left: `${tooltip.x - 140}px`,
-              marginRight: "20px",
-              backgroundColor: "white",
-              padding: "20px 20px",
-              borderRadius: "5px",
-              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
-              zIndex: 30,
 
-              whiteSpace: "normal", // Allows text to wrap
-              maxWidth: "30ch",
-              overflowWrap: "break-word",
-            }}
-          >
-            {tooltip.text}
-          </div>
-        )}
+        {/* SDG Images Mapping */}
+        {/* SDG Images Mapping */}
 
         {/* SDG Images Mapping */}
         <div className="flex flex-wrap justify-center mt-5 w-full">
@@ -206,7 +244,9 @@ export default function SearchResults() {
               onMouseEnter={(e) => showTooltip(index, e)}
               onMouseLeave={hideTooltip}
               style={{
-                paddingLeft: index % 4 === 0 ? "140px" : "10px",
+                position: "relative",
+                width: "100%",
+                paddingLeft: index % 4 === 0 ? "110px" : "10px",
               }}
             >
               <img
@@ -214,12 +254,47 @@ export default function SearchResults() {
                 alt={`SDG ${index + 1}`}
                 style={{
                   width: "calc((100% / 4) - 90px)",
-                  margin: "5px",
                   borderRadius: "10px",
                   cursor: "pointer",
                   boxShadow: "2px 4px 10px rgba(0, 0, 2, 0.2)",
+                  zIndex: 500,
                 }}
               />
+              <IconButton
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleTooltipToggle(index, e);
+                }}
+                style={{
+                  position: "absolute",
+                  top: "-260px",
+                  right: "5px",
+                  color: "white",
+                  cursor: "pointer",
+                  backgroundColor: "transparent",
+                  borderRadius: "50%",
+                  zIndex: 2000,
+                }}
+              >
+                <InfoIcon />
+              </IconButton>
+              {tooltip.show && tooltip.index === index && (
+                <div
+                  style={{
+                    color: "black",
+                    position: "absolute",
+                    top: "-225px",
+                    right: "0px",
+                    backgroundColor: "white",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    zIndex: 1000,
+                    maxWidth: "20ch",
+                  }}
+                >
+                  {tooltip.text}
+                </div>
+              )}
             </Link>
           ))}
         </div>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -18,6 +18,7 @@ import Paper from "@mui/material/Paper";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
+import { useLocation } from "react-router-dom";
 
 import {
   uploadBytes,
@@ -42,6 +43,22 @@ export default function CreateProfile() {
   const [selectedSDGs, setSelectedSDGs] = useState([]);
   const [profileImage, setProfileImage] = useState(null); // State for the profile image
   const profileImageInputRef = useRef(null); // Ref for the file input
+  const location = useLocation();
+  const [successMessage, setSuccessMessage] = useState(
+    location.state?.success || ""
+  );
+
+  useEffect(() => {
+    if (successMessage) {
+    
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const sdglist = [
     "SDG1 - No Poverty",
     "SDG2 - Zero Hunger",
@@ -137,70 +154,82 @@ export default function CreateProfile() {
   }
 
   return (
-    <Paper
-      elevation={4}
-      sx={{
-        mt: 7,
-        backgroundColor: "white",
-        width: 700,
-        marginLeft: "23%",
-        height: 830,
-        padding: 2,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Container
-        component="main"
-        maxWidth="sm"
+    <div>
+      {successMessage && <div className="confirmMessage">{successMessage}</div>}
+      <Paper
+        elevation={4}
         sx={{
-          display: "flex",
+          mt: 17,
+          backgroundColor: "white",
+          width: 700,
+          marginLeft: "23%",
+          height: 1000,
+          padding: 2,
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
         }}
       >
-        <Box
+        <Container
+          component="main"
+          maxWidth="sm"
           sx={{
-            marginTop: 8,
             display: "flex",
-            flexDirection: "column",
+            justifyContent: "center",
             alignItems: "center",
+            height: "100vh",
           }}
         >
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ fontFamily: "Tenor Sans" }}
-          >
-            Create Your Profile
-          </Typography>
-
-          {error && (
-            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
           <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 4 }}
+            sx={{
+              marginTop: 8,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
           >
-            <Grid container spacing={2}>
-              <Grid item xs={9}>
-                <Grid container spacing={2}>
-                  <Grid item xs={3}>
-                    <FormControl fullWidth required>
-                      <InputLabel id="demo-simple-select-label">
-                        Title
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        name="title"
-                        label="Title"
+            <h2 className="researchers-title">Create Your Profile </h2>
+
+            <Box
+              component="form"
+              noValidate
+              onSubmit={handleSubmit}
+              sx={{ mt: 4 }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={9}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={3}>
+                      <FormControl fullWidth required>
+                        <InputLabel id="demo-simple-select-label">
+                          Title
+                        </InputLabel>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          name="title"
+                          label="Title"
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              "&.Mui-focused fieldset": {
+                                borderColor: "black",
+                              },
+                            },
+                          }}
+                        >
+                          <MenuItem value={"Ms."}>Ms.</MenuItem>
+                          <MenuItem value={"Mr."}>Mr.</MenuItem>
+                          <MenuItem value={"Dr."}>Dr.</MenuItem>
+                          <MenuItem value={"Prof."}>Prof.</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4.5}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="firstName"
+                        label="First Name"
+                        autoComplete="given-name"
                         sx={{
                           "& .MuiOutlinedInput-root": {
                             "&.Mui-focused fieldset": {
@@ -208,230 +237,209 @@ export default function CreateProfile() {
                             },
                           },
                         }}
-                      >
-                        <MenuItem value={"Ms."}>Ms.</MenuItem>
-                        <MenuItem value={"Mr."}>Mr.</MenuItem>
-                        <MenuItem value={"Dr."}>Dr.</MenuItem>
-                        <MenuItem value={"Prof."}>Prof.</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4.5}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="firstName"
-                      label="First Name"
-                      autoComplete="given-name"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "&.Mui-focused fieldset": {
-                            borderColor: "black",
-                          },
-                        },
-                      }}
-                    />
-                  </Grid>
+                      />
+                    </Grid>
 
-                  <Grid item xs={4.5}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="lastName"
-                      label="Last Name"
-                      autoComplete="family-name"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "&.Mui-focused fieldset": {
-                            borderColor: "black",
+                    <Grid item xs={4.5}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="lastName"
+                        label="Last Name"
+                        autoComplete="family-name"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "&.Mui-focused fieldset": {
+                              borderColor: "black",
+                            },
                           },
-                        },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="role"
-                      label="Role"
-                      autoComplete="role"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "&.Mui-focused fieldset": {
-                            borderColor: "black",
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="role"
+                        label="Role"
+                        autoComplete="role"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "&.Mui-focused fieldset": {
+                              borderColor: "black",
+                            },
                           },
-                        },
-                      }}
-                    />
+                        }}
+                      />
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
 
-              {/* Profile Image */}
-              <Grid item xs={3}>
-                <Avatar
-                  alt="Profile Image"
-                  src={profileImage || "../assets/profile-photo.webp"}
-                  sx={{
-                    width: 120,
-                    height: 120,
-                    border: "1px solid #838181",
-                    boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.2)",
-                    cursor: "pointer",
-                    "& img": {
-                      objectFit: "fit",
-                    },
-                  }}
-                  onClick={handleProfileImageClick}
-                >
-                  <IconButton
-                    color="primary"
-                    aria-label="upload picture"
-                    component="span"
+                {/* Profile Image */}
+                <Grid item xs={3}>
+                  <Avatar
+                    alt="Profile Image"
+                    src={profileImage || "../assets/profile-photo.webp"}
+                    sx={{
+                      width: 120,
+                      height: 120,
+                      border: "1px solid #838181",
+                      boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.2)",
+                      cursor: "pointer",
+                      "& img": {
+                        objectFit: "fit",
+                      },
+                    }}
+                    onClick={handleProfileImageClick}
                   >
-                    <PhotoCamera />
-                  </IconButton>
-                </Avatar>
-                <input
-                  type="file"
-                  ref={profileImageInputRef}
-                  onChange={handleProfileImageChange}
-                  style={{ display: "none" }}
-                  accept="image/*"
-                />
-              </Grid>
+                    <IconButton
+                      color="primary"
+                      aria-label="upload picture"
+                      component="span"
+                    >
+                      <PhotoCamera />
+                    </IconButton>
+                  </Avatar>
+                  <input
+                    type="file"
+                    ref={profileImageInputRef}
+                    onChange={handleProfileImageChange}
+                    style={{ display: "none" }}
+                    accept="image/*"
+                  />
+                </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="linkedinName"
-                  label="LinkedIn Username"
-                  multiline
-                  rows={1}
-                  autoComplete="linkedinName"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "&.Mui-focused fieldset": {
-                        borderColor: "black",
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="linkedinName"
+                    label="LinkedIn Username"
+                    multiline
+                    rows={1}
+                    autoComplete="linkedinName"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: "black",
+                        },
                       },
-                    },
-                  }}
-                />
-              </Grid>
+                    }}
+                  />
+                </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="linkedin"
-                  label="Link to LinkedIn"
-                  multiline
-                  rows={1}
-                  autoComplete="linkedin"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "&.Mui-focused fieldset": {
-                        borderColor: "black",
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="linkedin"
+                    label="Link to LinkedIn"
+                    multiline
+                    rows={1}
+                    autoComplete="linkedin"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: "black",
+                        },
                       },
-                    },
-                  }}
-                />
-              </Grid>
+                    }}
+                  />
+                </Grid>
 
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="biography"
-                  label="Biography"
-                  multiline
-                  rows={4}
-                  autoComplete="biography"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "&.Mui-focused fieldset": {
-                        borderColor: "black",
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="biography"
+                    label="Biography"
+                    multiline
+                    rows={4}
+                    autoComplete="biography"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: "black",
+                        },
                       },
-                    },
-                  }}
-                />
-              </Grid>
+                    }}
+                  />
+                </Grid>
 
-              {/* Current Projects Field */}
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  multiline
-                  rows={4}
-                  name="currentProjects"
-                  label="Current Projects"
-                  autoComplete="current-projects"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "&.Mui-focused fieldset": {
-                        borderColor: "black",
+                {/* Current Projects Field */}
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    multiline
+                    rows={4}
+                    name="currentProjects"
+                    label="Current Projects"
+                    autoComplete="current-projects"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: "black",
+                        },
                       },
-                    },
-                  }}
-                />
+                    }}
+                  />
+                </Grid>
+
+                {/* SDGs Checklist */}
+                <Grid item xs={12}>
+                  <InputLabel sx={{ my: 2 }}>Research Interests</InputLabel>
+
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      padding: 2,
+                      maxHeight: 130,
+                      borderStyle: "solid",
+                      borderColor: "#D0D0D0",
+                      maxWidth: 1030,
+                      overflowY: "auto",
+                      mt: 1,
+                      mb: 1,
+                      "&:hover": {
+                        borderColor: "black", // Changes border to black on hover
+                      },
+                    }}
+                  >
+                    <FormGroup>
+                      {sdglist.map((sdg) => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={selectedSDGs.includes(sdg)}
+                              onChange={handleSDGChange}
+                              value={sdg}
+                            />
+                          }
+                          label={sdg}
+                          key={sdg}
+                        />
+                      ))}
+                    </FormGroup>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12}></Grid>
               </Grid>
-
-              {/* SDGs Checklist */}
-              <Grid item xs={12}>
-                <InputLabel sx={{ my: 2 }}>Research Interests</InputLabel>
-
-                <Paper
-                  elevation={2}
-                  sx={{
-                    padding: 2,
-                    maxHeight: 130,
-                    borderStyle: "solid",
-                    borderColor: "#D0D0D0",
-                    maxWidth: 1030,
-                    overflowY: "auto",
-                    mt: 1,
-                    mb: 1,
-                    "&:hover": {
-                      borderColor: "black", // Changes border to black on hover
-                    },
-                  }}
+              <Grid container justifyContent="center" sx={{ mt: 3, mb: 2 }}>
+                <Button
+                  // disabled={loading}
+                  type="submit"
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2, width: 400 }}
                 >
-                  <FormGroup>
-                    {sdglist.map((sdg) => (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={selectedSDGs.includes(sdg)}
-                            onChange={handleSDGChange}
-                            value={sdg}
-                          />
-                        }
-                        label={sdg}
-                        key={sdg}
-                      />
-                    ))}
-                  </FormGroup>
-                </Paper>
+                  Create
+                </Button>
               </Grid>
-
-              <Grid item xs={12}></Grid>
-            </Grid>
-            <Grid container justifyContent="center" sx={{ mt: 3, mb: 2 }}>
-              <Button
-                // disabled={loading}
-                type="submit"
-                variant="contained"
-                sx={{ mt: 3, mb: 2, width: 400 }}
-              >
-                Create
-              </Button>
-            </Grid>
+            </Box>
           </Box>
-        </Box>
-      </Container>
-    </Paper>
+        </Container>
+      </Paper>
+    </div>
   );
 }

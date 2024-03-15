@@ -238,7 +238,7 @@ const ProfileInfoPopup = ({
       >
         X
       </button>
-      {(emailCounts[profile.id] + 1 || 0) < maxEmails && (
+      {emailCounts[`${currentUser?.uid}_${profile?.id}`] < maxEmails && (
         <IconButton
           onClick={(event) => handleContactClick(event, profile)}
           className="noHoverEffect"
@@ -267,23 +267,25 @@ const ProfileInfoPopup = ({
         <div
           style={{ display: "flex", alignItems: "center", marginTop: "90px" }}
         >
-          <img
-            src={
-              profile.profileImage ||
-              require("../components/assets/profile-photo.webp")
-            }
-            // alt={`${profile.firstName} ${profile.lastName}`}
-            style={{
-              border: "1px solid #393939",
-              boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
-              width: "125px",
-              height: "125px",
-              borderRadius: "50%",
-
-              marginRight: "40px",
-            }}
-          />
-          <div>
+          <div style={{ marginLeft: "-60px" }}>
+            {" "}
+            {/* Move the image 60px to the left */}
+            <img
+              src={
+                profile.profileImage ||
+                require("../components/assets/profile-photo.webp")
+              }
+              style={{
+                border: "1px solid #393939",
+                boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
+                width: "125px",
+                height: "125px",
+                borderRadius: "50%",
+                marginRight: "20px",
+              }}
+            />
+          </div>
+          <div style={{ maxWidth: "300px" }}>
             <Typography
               component="h1"
               variant="h4"
@@ -299,6 +301,7 @@ const ProfileInfoPopup = ({
               sx={{
                 fontFamily: "Tensor Sans",
                 marginBottom: "20px",
+                wordWrap: "break-word",
               }}
             >
               {profile.role}
@@ -423,6 +426,7 @@ const ProfilePopup = ({
   setErrorMessage,
 
   emailCounts,
+  setShowContactButton,
 }) => {
   //State variables to keep track of the amount of emails sent to another user
 
@@ -501,6 +505,15 @@ const ProfilePopup = ({
             });
             setTimeout(() => setErrorMessage({ text: "", show: false }), 8000);
             onClose(); // Close the contact popup
+            const updatedEmailCounts = {
+              ...emailCounts,
+              [`${currentUser.uid}_${profile.id}`]: newCount,
+            };
+            setEmailCount(updatedEmailCounts);
+            setShowContactButton((prevState) => ({
+              ...prevState,
+              [profile.id]: false,
+            }));
           } else {
             setConfirmMessage({
               text: `Email has been sent. You now have ${
@@ -632,7 +645,6 @@ const ProfilePopup = ({
             </div>
           </div>
         </Typography>
-       
 
         {/* Popup content */}
         <div>
@@ -700,6 +712,9 @@ const ProfilePopup = ({
 };
 
 export default function Researchers() {
+  const [showContactButton, setShowContactButton] = useState({});
+
+  const { currentUser } = useAuth();
   const [confirmMessage, setConfirmMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -734,6 +749,30 @@ export default function Researchers() {
     fetchProfiles();
   }, []);
 
+  const fetchEmailCount = async (userId, profileId) => {
+    const emailCountsRef = doc(db, "emailCounts", `${userId}_${profileId}`);
+    const docSnap = await getDoc(emailCountsRef);
+
+    if (docSnap.exists()) {
+      setEmailCounts((prev) => ({
+        ...prev,
+        [`${userId}_${profileId}`]: docSnap.data().count,
+      }));
+    } else {
+      setEmailCounts((prev) => ({ ...prev, [`${userId}_${profileId}`]: 0 }));
+    }
+  };
+
+  useEffect(() => {
+    // Other useEffect contents
+
+    if (currentUser && profiles.length > 0) {
+      profiles.forEach((profile) => {
+        // Make sure you pass the correct arguments to fetchEmailCount
+        fetchEmailCount(currentUser.uid, profile.id);
+      });
+    }
+  }, [currentUser, profiles]);
   const handleProfileClick = (profile) => {
     setSelectedProfile(profile);
     setContactProfile(null); // Close the contact popup if it's open
@@ -829,6 +868,14 @@ export default function Researchers() {
     backgroundColor: "#F8FAFB",
   };
 
+  useEffect(() => {
+    const initialButtonVisibility = profiles.reduce((acc, profile) => {
+      acc[profile.id] = true; // Initially, all buttons are visible
+      return acc;
+    }, {});
+
+    setShowContactButton(initialButtonVisibility);
+  }, [profiles, currentUser]);
   return (
     <div className="flex flex-col items-center justify-center">
       <div>
@@ -970,29 +1017,39 @@ export default function Researchers() {
                   style={{ marginLeft: "5px", marginBottom: "5px" }}
                 >{`${profile.firstName} ${profile.lastName}`}</div>
               </div>
+
+              <div style={{ marginLeft: "5px", marginBottom: "5px" }}>
+                {`Emails: ${
+                  emailCounts[`${currentUser?.uid}_${profile?.id}`] ||
+                  "Loading..."
+                }`}
+              </div>
+
               <div style={{ cursor: "pointer" }}>{profile.role}</div>
             </div>
 
-            {(emailCounts[profile.id] + 1 || 0) <= maxEmails && (
-              <IconButton
-                onClick={(event) => handleContactClick(event, profile)}
-                className="noHoverEffect"
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "10px",
-                  cursor: "pointer",
-                  fontFamily: "Tensor Sans",
-                  color: "black",
-                  fontSize: "16px",
-                }}
-              >
-                Contact{" "}
-                <EmailOutlinedIcon
-                  style={{ color: "black", marginLeft: "5px" }}
-                />
-              </IconButton>
-            )}
+            {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 <=
+              maxEmails &&
+              showContactButton[profile.id] !== false && (
+                <IconButton
+                  onClick={(event) => handleContactClick(event, profile)}
+                  className="noHoverEffect"
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    cursor: "pointer",
+                    fontFamily: "Tensor Sans",
+                    color: "black",
+                    fontSize: "16px",
+                  }}
+                >
+                  Contact{" "}
+                  <EmailOutlinedIcon
+                    style={{ color: "black", marginLeft: "5px" }}
+                  />
+                </IconButton>
+              )}
           </Paper>
         ))}
       </div>
@@ -1031,6 +1088,7 @@ export default function Researchers() {
             emailCounts={emailCounts}
             errorMessage={errorMessage}
             setErrorMessage={setErrorMessage}
+            setShowContactButton={setShowContactButton}
           />
         </Modal>
       )}
