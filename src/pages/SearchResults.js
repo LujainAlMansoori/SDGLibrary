@@ -273,7 +273,7 @@ export default function SearchResults() {
                   cursor: "pointer",
                   backgroundColor: "transparent",
                   borderRadius: "50%",
-                  zIndex: 2000,
+                  zIndex: 600,
                 }}
               >
                 <InfoIcon />
