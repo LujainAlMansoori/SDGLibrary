@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContexts";
 import logo from "./assets/logo.png";
@@ -7,8 +7,10 @@ import { db } from "../firebase";
 import "./style/NavBar.css";
 import MenuListComposition from "./menuListComponent.js";
 import Modal from "@mui/material/Modal";
+import { Typography } from "@mui/material";
 
 export default function NavBar() {
+  const location = useLocation();
   const [openFilter, setOpenFilter] = useState(false); // State to handle filter visibility
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -82,15 +84,19 @@ export default function NavBar() {
             <li style={{ mmarginRight: "10px" }}>
               <Link to="/">Home</Link>
             </li>
+            {userProfile && userProfile.accountRole === "admin" && (
+              <li style={{ marginRight: "10px" }}>
+                <Link to="/NewMaterial">Add Material</Link>
+              </li>
+            )}
             <li style={{ marginRight: "10px" }}>
-              <Link to="/NewMaterial">New Material</Link>
+              <Link to="/SearchResults">Search</Link>
             </li>
-            <li style={{ marginRight: "10px" }}>
-              <Link to="/SearchResults">SearchResults</Link>
-            </li>
-            <li style={{ marginRight: "10px" }}>
-              <Link to="/Researchers">Researchers</Link>
-            </li>
+            {currentUser && (
+              <li style={{ marginRight: "10px" }}>
+                <Link to="/Researchers">Members</Link>
+              </li>
+            )}
           </ul>
         </div>
         <div
@@ -117,10 +123,12 @@ export default function NavBar() {
                 {userProfile.title} {userProfile.firstName}{" "}
                 {userProfile.lastName}
               </span>
-
-              
               <MenuListComposition logout={logout} navigate={navigate} />{" "}
             </>
+          ) : location.pathname === "/createprofile" ? (
+            <li style={{ marginRight: "10px" }}>
+              <Typography onClick={handleLogout}>Log Out</Typography>
+            </li>
           ) : (
             <li style={{ marginRight: "10px" }}>
               <Link to="/Signup">Sign In</Link>
