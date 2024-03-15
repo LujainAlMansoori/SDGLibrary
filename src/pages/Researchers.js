@@ -539,6 +539,11 @@ const ProfilePopup = ({
         },
         (error) => {
           console.log("Send email error:", error.text);
+          setErrorMessage({
+            text: "Failed to send email.",
+            show: true,
+          });
+          setTimeout(() => setErrorMessage({ text: "", show: false }), 5000);
         }
       );
   };
@@ -741,13 +746,15 @@ export default function Researchers() {
           id: doc.id,
           ...doc.data(),
         }))
+
+        .filter((profile) => profile.id !== currentUser.uid) // Filter out the current user's profile
         .sort((a, b) => a.firstName.localeCompare(b.firstName));
 
       setProfiles(profilesList);
     };
 
     fetchProfiles();
-  }, []);
+  }, [currentUser]);
 
   const fetchEmailCount = async (userId, profileId) => {
     const emailCountsRef = doc(db, "emailCounts", `${userId}_${profileId}`);
@@ -886,7 +893,7 @@ export default function Researchers() {
         {confirmMessage.show && (
           <div className="confirmMessage">{confirmMessage.text}</div>
         )}
-        <h2 className="researchers-title">Researchers</h2>
+        <h2 className="researchers-title">SDGLibrary Members</h2>
         <TextField // Search bar
           label="Search Researchers..."
           variant="outlined"
@@ -1022,27 +1029,43 @@ export default function Researchers() {
             </div>
 
             {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 <=
-              maxEmails &&
-              showContactButton[profile.id] !== false && (
-                <IconButton
-                  onClick={(event) => handleContactClick(event, profile)}
-                  className="noHoverEffect"
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    cursor: "pointer",
-                    fontFamily: "Tensor Sans",
-                    color: "black",
-                    fontSize: "16px",
-                  }}
-                >
-                  Contact{" "}
-                  <EmailOutlinedIcon
-                    style={{ color: "black", marginLeft: "5px" }}
-                  />
-                </IconButton>
-              )}
+              maxEmails && showContactButton[profile.id] !== false ? (
+              <IconButton
+                onClick={(event) => handleContactClick(event, profile)}
+                className="noHoverEffect"
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  cursor: "pointer",
+                  fontFamily: "Tensor Sans",
+                  color: "black",
+                  fontSize: "16px",
+                }}
+              >
+                Contact{" "}
+                <EmailOutlinedIcon
+                  style={{ color: "black", marginLeft: "5px" }}
+                />
+              </IconButton>
+            ) : (
+              <IconButton
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  cursor: "not-allowed",
+                  fontFamily: "Tensor Sans",
+                  color: "grey",
+                  fontSize: "16px",
+                }}
+              >
+                Contact{" "}
+                <EmailOutlinedIcon
+                  style={{ color: "grey", marginLeft: "5px" }} // Apply grey color to the icon
+                />
+              </IconButton>
+            )}
           </Paper>
         ))}
       </div>
