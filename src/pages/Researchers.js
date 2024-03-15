@@ -1022,27 +1022,43 @@ export default function Researchers() {
             </div>
 
             {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 <=
-              maxEmails &&
-              showContactButton[profile.id] !== false && (
-                <IconButton
-                  onClick={(event) => handleContactClick(event, profile)}
-                  className="noHoverEffect"
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    cursor: "pointer",
-                    fontFamily: "Tensor Sans",
-                    color: "black",
-                    fontSize: "16px",
-                  }}
-                >
-                  Contact{" "}
-                  <EmailOutlinedIcon
-                    style={{ color: "black", marginLeft: "5px" }}
-                  />
-                </IconButton>
-              )}
+              maxEmails && showContactButton[profile.id] !== false ? (
+              <IconButton
+                onClick={(event) => handleContactClick(event, profile)}
+                className="noHoverEffect"
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  cursor: "pointer",
+                  fontFamily: "Tensor Sans",
+                  color: "black",
+                  fontSize: "16px",
+                }}
+              >
+                Contact{" "}
+                <EmailOutlinedIcon
+                  style={{ color: "black", marginLeft: "5px" }}
+                />
+              </IconButton>
+            ) : (
+              <IconButton
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "10px",
+                  cursor: "not-allowed",
+                  fontFamily: "Tensor Sans",
+                  color: "grey",
+                  fontSize: "16px",
+                }}
+              >
+                Contact{" "}
+                <EmailOutlinedIcon
+                  style={{ color: "grey", marginLeft: "5px" }} // Apply grey color to the icon
+                />
+              </IconButton>
+            )}
           </Paper>
         ))}
       </div>
