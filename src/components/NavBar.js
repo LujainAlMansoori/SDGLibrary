@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContexts";
 import logo from "./assets/logo.png";
@@ -7,8 +7,10 @@ import { db } from "../firebase";
 import "./style/NavBar.css";
 import MenuListComposition from "./menuListComponent.js";
 import Modal from "@mui/material/Modal";
+import { Typography } from "@mui/material";
 
 export default function NavBar() {
+  const location = useLocation();
   const [openFilter, setOpenFilter] = useState(false); // State to handle filter visibility
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -34,7 +36,7 @@ export default function NavBar() {
     };
 
     fetchUserProfile();
-  }, [currentUser]);
+  }, [currentUser, location.pathname]);
 
   const handleLogout = async () => {
     try {
@@ -82,49 +84,70 @@ export default function NavBar() {
             <li style={{ mmarginRight: "10px" }}>
               <Link to="/">Home</Link>
             </li>
+            {userProfile && userProfile.accountRole === "admin" && (
+              <li style={{ marginRight: "10px" }}>
+                <Link to="/NewMaterial">Add Material</Link>
+              </li>
+            )}
             <li style={{ marginRight: "10px" }}>
-              <Link to="/NewMaterial">New Material</Link>
+              <Link to="/SearchResults">Search</Link>
             </li>
-            <li style={{ marginRight: "10px" }}>
-              <Link to="/SearchResults">SearchResults</Link>
-            </li>
-            <li style={{ marginRight: "10px" }}>
-              <Link to="/Researchers">Researchers</Link>
-            </li>
+            {currentUser &&
+              userProfile &&
+              userProfile.role &&
+              userProfile.firstName &&
+              userProfile.lastName && (
+                <li style={{ marginRight: "10px" }}>
+                  <Link to="/Researchers">Members</Link>
+                </li>
+              )}
           </ul>
         </div>
         <div
           style={{ display: "flex", alignItems: "center", marginRight: "40px" }}
         >
-          {currentUser && userProfile ? (
+          {currentUser ? (
             <>
-              <img
-                src={
-                  userProfile.profileImage ||
-                  require("../components/assets/profile-photo.webp")
-                }
-                alt="Profile"
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  border: "1px solid #5c5b5b",
-                  boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
-                  borderRadius: "50%",
-                  marginRight: "10px",
-                }}
-              />
-              <span style={{ marginRight: "10px" }}>
-                {userProfile.title} {userProfile.firstName}{" "}
-                {userProfile.lastName}
-              </span>
-
-              
-              <MenuListComposition logout={logout} navigate={navigate} />{" "}
+              {userProfile ? (
+                <>
+                  <img
+                    src={
+                      userProfile.profileImage ||
+                      require("../components/assets/profile-photo.webp")
+                    }
+                    alt="Profile"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      border: "1px solid #5c5b5b",
+                      boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
+                      borderRadius: "50%",
+                      marginRight: "10px",
+                    }}
+                  />
+                  <span style={{ marginRight: "10px" }}>
+                    {userProfile.title} {userProfile.firstName}{" "}
+                    {userProfile.lastName}
+                  </span>
+                  <MenuListComposition logout={logout} navigate={navigate} />{" "}
+                </>
+              ) : (
+                <Typography
+                  onClick={handleLogout}
+                  style={{ cursor: "pointer", marginRight: "10px" }}
+                >
+                  Log Out
+                </Typography>
+              )}
             </>
           ) : (
-            <li style={{ marginRight: "10px" }}>
-              <Link to="/Signup">Sign In</Link>
-            </li>
+            <Link
+              to="/Signup"
+              className="nav-link"
+              style={{ marginRight: "10px" }}
+            >
+              Sign In
+            </Link>
           )}
         </div>
       </nav>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Alert from "@mui/material/Alert";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -18,7 +18,6 @@ import Paper from "@mui/material/Paper";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
-
 
 import {
   uploadBytes,
@@ -35,8 +34,61 @@ import { doc, setDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContexts";
 
 export default function CreateProfile() {
+  const location = useLocation();
+  const [formValues, setFormValues] = useState({
+    title: "",
+    firstName: "",
+    lastName: "",
+    role: "",
+    linkedinName: "",
+    linkedin: "",
+    biography: "",
+    currentProjects: "",
+  });
 
- 
+  const [linkError, setLinkError] = useState("");
+
+  const [confirmMessage, setConfirmMessage] = useState({
+    text: "",
+    show: false,
+  });
+  const [errorMessage, setErrorMessage] = useState({ text: "", show: false });
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    if (name === "linkedin") {
+      const urlPattern =
+        /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
+      if (value && !urlPattern.test(value)) {
+        setLinkError("Add a valid link.");
+      } else {
+        setLinkError("");
+      }
+    }
+
+    setFormValues({ ...formValues, [name]: value });
+  };
+
+  const isFormValid = () => {
+    return (
+      Object.values(formValues).every((value) => value.trim() !== "") &&
+      selectedSDGs.length > 0 &&
+      linkError === ""
+    );
+  };
+
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.success) {
+      setShowSuccessMessage(true);
+      const timer = setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000); // 5000 milliseconds = 5 seconds
+
+      return () => clearTimeout(timer); // Clean up the timer when the component unmounts
+    }
+  }, [location.state?.success]);
 
   const { currentUser } = useAuth(); // Get the current user from the AuthContext
   const [loading, setLoading] = useState(false);
@@ -77,6 +129,16 @@ export default function CreateProfile() {
     profileImageInputRef.current.click();
   };
 
+  useEffect(() => {
+    if (location.state?.showProfileAlert) {
+      setErrorMessage({
+        text: "You must create an account before viewing members.",
+        show: true,
+      });
+      setTimeout(() => setErrorMessage({ text: "", show: false }), 5000);
+    }
+  }, [location.state?.showProfileAlert]);
+
   // This gets the user's SDGs
   const handleSDGChange = (event) => {
     if (event.target.checked) {
@@ -89,10 +151,6 @@ export default function CreateProfile() {
     event.preventDefault();
     // Profile image  URL
     let profileImageUrl = "";
-    // Validation checks
-    //  if (PasswordRef.current.value !== ConfirmPasswordRef.current.value) {
-    //  return setError("Passwords Do Not Match.");
-    //  }
 
     // Editing the user's information to include fields from create profile
     if (!currentUser) {
@@ -117,93 +175,148 @@ export default function CreateProfile() {
       lastName: event.target.lastName.value,
       role: event.target.role.value,
       biography: event.target.biography.value,
+      linkedinName: event.target.linkedinName.value,
+      linkedin: event.target.linkedin.value,
       currentProjects: event.target.currentProjects.value,
       researchInterests: selectedSDGs,
       profileImage: profileImageUrl,
       email: currentUser.email,
+      accountRole: "member",
     };
 
     try {
-      // TODO: error message
       setError("");
       setLoading(true);
-      // Set the document in the 'profiles' collection with the user's UID as the document ID
       await setDoc(doc(db, "profiles", currentUser.uid), userProfile);
-      navigate("/researchers");
-      console.log("Profile created successfully");
+      setConfirmMessage({
+        text: "Successfully created profile.",
+        show: true,
+      });
+      setTimeout(() => {
+        setConfirmMessage({ text: "", show: false });
+        navigate("/researchers", {
+          state: { success: "Successfully created profile." },
+        });
+      }, 5000);
     } catch (error) {
-      console.error("Error creating profile:", error);
-      setError("Failed to Create a Profile.");
+      console.error("Error writing document: ", error);
+      setErrorMessage({
+        text: "Failed to create profile.",
+        show: true,
+      });
+      setTimeout(() => setErrorMessage({ text: "", show: false }), 5000);
     }
     setLoading(false);
   }
 
   return (
-    <Paper
-      elevation={4}
-      sx={{
-        mt: 7,
-        backgroundColor: "white",
-        width: 700,
-        marginLeft: "23%",
-        height: 830,
-        padding: 2,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Container
-        component="main"
-        maxWidth="sm"
+    <div>
+      {showSuccessMessage && (
+        <div className="confirmMessage">
+          <Typography>{location.state.success}</Typography>
+        </div>
+      )}
+
+      {confirmMessage.show && (
+        <div className="confirmMessage">
+          <Typography>{confirmMessage.text}</Typography>
+        </div>
+      )}
+      {errorMessage.show && (
+        <div className="errorMessage">
+          <Typography>{errorMessage.text}</Typography>
+        </div>
+      )}
+      <Paper
+        elevation={4}
         sx={{
-          display: "flex",
+          mt: 14,
+          backgroundColor: "white",
+          width: 700,
+          marginLeft: "23%",
+          height: 900,
+          padding: 2,
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
         }}
       >
-        <Box
+        <Container
+          component="main"
+          maxWidth="sm"
           sx={{
-            marginTop: 8,
             display: "flex",
-            flexDirection: "column",
+            justifyContent: "center",
             alignItems: "center",
+            height: "100vh",
           }}
         >
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ fontFamily: "Tenor Sans" }}
-          >
-            Create Your Profile
-          </Typography>
-
-          {error && (
-            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
           <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 4 }}
+            sx={{
+              marginTop: 8,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
           >
-            <Grid container spacing={2}>
-              {/* Title, First Name, Last Name, Role */}
-              <Grid item xs={9}>
-                <Grid container spacing={2}>
-                  <Grid item xs={3}>
-                    <FormControl fullWidth required>
-                      <InputLabel id="demo-simple-select-label">
-                        Title
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        name="title"
-                        label="Title"
+            <Typography
+              component="h1"
+              variant="h4"
+              sx={{ fontFamily: "Tenor Sans" }}
+            >
+              Create Your Profile
+            </Typography>
+
+            {error && (
+              <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
+            <Box
+              component="form"
+              noValidate
+              onSubmit={handleSubmit}
+              sx={{ mt: 4 }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={9}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={3}>
+                      <FormControl fullWidth required>
+                        <InputLabel id="demo-simple-select-label">
+                          Title
+                        </InputLabel>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          name="title"
+                          value={formValues.title}
+                          label="Title"
+                          onChange={handleChange}
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              "&.Mui-focused fieldset": {
+                                borderColor: "black",
+                              },
+                            },
+                          }}
+                        >
+                          <MenuItem value={"Ms."}>Ms.</MenuItem>
+                          <MenuItem value={"Mr."}>Mr.</MenuItem>
+                          <MenuItem value={"Dr."}>Dr.</MenuItem>
+                          <MenuItem value={"Prof."}>Prof.</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4.5}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="firstName"
+                        value={formValues.firstName}
+                        onChange={handleChange}
+                        label="First Name"
+                        autoComplete="given-name"
                         sx={{
                           "& .MuiOutlinedInput-root": {
                             "&.Mui-focused fieldset": {
@@ -211,191 +324,223 @@ export default function CreateProfile() {
                             },
                           },
                         }}
-                      >
-                        <MenuItem value={"Ms."}>Ms.</MenuItem>
-                        <MenuItem value={"Mr."}>Mr.</MenuItem>
-                        <MenuItem value={"Dr."}>Dr.</MenuItem>
-                        <MenuItem value={"Prof."}>Prof.</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4.5}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="firstName"
-                      label="First Name"
-                      autoComplete="given-name"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "&.Mui-focused fieldset": {
-                            borderColor: "black",
+                      />
+                    </Grid>
+
+                    <Grid item xs={4.5}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="lastName"
+                        label="Last Name"
+                        value={formValues.lastName}
+                        onChange={handleChange}
+                        autoComplete="family-name"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "&.Mui-focused fieldset": {
+                              borderColor: "black",
+                            },
                           },
-                        },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={4.5}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="lastName"
-                      label="Last Name"
-                      autoComplete="family-name"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "&.Mui-focused fieldset": {
-                            borderColor: "black",
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="role"
+                        label="Role"
+                        value={formValues.role}
+                        onChange={handleChange}
+                        autoComplete="role"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "&.Mui-focused fieldset": {
+                              borderColor: "black",
+                            },
                           },
-                        },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="role"
-                      label="Role"
-                      autoComplete="role"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "&.Mui-focused fieldset": {
-                            borderColor: "black",
-                          },
-                        },
-                      }}
-                    />
+                        }}
+                      />
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
 
-              {/* Profile Image */}
-              <Grid item xs={3}>
-                <Avatar
-                  alt="Profile Image"
-                  src={profileImage || "../assets/profile-photo.webp"}
-                  sx={{
-                    width: 120,
-                    height: 120,
-                    border: "1px solid #838181",
-                    boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.2)",
-                    cursor: "pointer",
-                    "& img": {
-                      objectFit: "fit",
-                    },
-                  }}
-                  onClick={handleProfileImageClick}
-                >
-                  <IconButton
-                    color="primary"
-                    aria-label="upload picture"
-                    component="span"
+                {/* Profile Image */}
+                <Grid item xs={3}>
+                  <Avatar
+                    alt="Profile Image"
+                    src={profileImage || "../assets/profile-photo.webp"}
+                    sx={{
+                      width: 120,
+                      height: 120,
+                      border: "1px solid #838181",
+                      boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.2)",
+                      cursor: "pointer",
+                      "& img": {
+                        objectFit: "fit",
+                      },
+                    }}
+                    onClick={handleProfileImageClick}
                   >
-                    <PhotoCamera />
-                  </IconButton>
-                </Avatar>
-                <input
-                  type="file"
-                  ref={profileImageInputRef}
-                  onChange={handleProfileImageChange}
-                  style={{ display: "none" }}
-                  accept="image/*"
-                />
-              </Grid>
-              {/* Biography Field */}
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="biography"
-                  label="Biography"
-                  multiline
-                  rows={4}
-                  autoComplete="biography"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "&.Mui-focused fieldset": {
-                        borderColor: "black",
+                    <IconButton
+                      color="primary"
+                      aria-label="upload picture"
+                      component="span"
+                    >
+                      <PhotoCamera />
+                    </IconButton>
+                  </Avatar>
+                  <input
+                    type="file"
+                    ref={profileImageInputRef}
+                    onChange={handleProfileImageChange}
+                    style={{ display: "none" }}
+                    accept="image/*"
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="linkedinName"
+                    label="LinkedIn Username"
+                    value={formValues.likedinName}
+                    onChange={handleChange}
+                    multiline
+                    rows={1}
+                    autoComplete="linkedinName"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: "black",
+                        },
                       },
-                    },
-                  }}
-                />
-              </Grid>
+                    }}
+                  />
+                </Grid>
 
-              {/* Current Projects Field */}
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  multiline
-                  rows={4}
-                  name="currentProjects"
-                  label="Current Projects"
-                  autoComplete="current-projects"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      "&.Mui-focused fieldset": {
-                        borderColor: "black",
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="linkedin"
+                    label="Link to LinkedIn"
+                    value={formValues.linkedin}
+                    onChange={handleChange}
+                    multiline
+                    rows={1}
+                    error={Boolean(linkError)}
+                    helperText={linkError}
+                    autoComplete="linkedin"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: "black",
+                        },
                       },
-                    },
-                  }}
-                />
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    name="biography"
+                    label="Biography"
+                    value={formValues.biography}
+                    onChange={handleChange}
+                    multiline
+                    rows={4}
+                    autoComplete="biography"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: "black",
+                        },
+                      },
+                    }}
+                  />
+                </Grid>
+
+                {/* Current Projects Field */}
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    fullWidth
+                    multiline
+                    rows={4}
+                    name="currentProjects"
+                    label="Current Projects"
+                    value={formValues.currentProjects}
+                    onChange={handleChange}
+                    autoComplete="current-projects"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "&.Mui-focused fieldset": {
+                          borderColor: "black",
+                        },
+                      },
+                    }}
+                  />
+                </Grid>
+
+                {/* SDGs Checklist */}
+                <Grid item xs={12}>
+                  <InputLabel sx={{ my: 2 }}>Research Interests</InputLabel>
+
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      padding: 2,
+                      maxHeight: 130,
+                      borderStyle: "solid",
+                      borderColor: "#D0D0D0",
+                      maxWidth: 1030,
+                      overflowY: "auto",
+                      mt: 1,
+                      mb: 1,
+                      "&:hover": {
+                        borderColor: "black", // Changes border to black on hover
+                      },
+                    }}
+                  >
+                    <FormGroup>
+                      {sdglist.map((sdg) => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={selectedSDGs.includes(sdg)}
+                              onChange={handleSDGChange}
+                              value={sdg}
+                            />
+                          }
+                          label={sdg}
+                          key={sdg}
+                        />
+                      ))}
+                    </FormGroup>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12}></Grid>
               </Grid>
-
-              {/* SDGs Checklist */}
-              <Grid item xs={12}>
-                <InputLabel sx={{ my: 2 }}>Research Interests</InputLabel>
-
-                <Paper
-                  elevation={2}
-                  sx={{
-                    padding: 2,
-                    maxHeight: 130,
-                    borderStyle: "solid",
-                    borderColor: "#D0D0D0",
-                    maxWidth: 1030,
-                    overflowY: "auto",
-                    mt: 1,
-                    mb: 1,
-                    "&:hover": {
-                      borderColor: "black", // Changes border to black on hover
-                    },
-                  }}
+              <Grid container justifyContent="center" sx={{ mt: 3, mb: 2 }}>
+                <Button
+                  disabled={!isFormValid()}
+                  type="submit"
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2, width: 400 }}
                 >
-                  <FormGroup>
-                    {sdglist.map((sdg) => (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={selectedSDGs.includes(sdg)}
-                            onChange={handleSDGChange}
-                            value={sdg}
-                          />
-                        }
-                        label={sdg}
-                        key={sdg}
-                      />
-                    ))}
-                  </FormGroup>
-                </Paper>
+                  Create
+                </Button>
               </Grid>
-
-              <Grid item xs={12}></Grid>
-            </Grid>
-            <Grid container justifyContent="center" sx={{ mt: 3, mb: 2 }}>
-              <Button
-                // disabled={loading}
-                type="submit"
-                variant="contained"
-                sx={{ mt: 3, mb: 2, width: 400 }}
-              >
-                Create
-              </Button>
-            </Grid>
+            </Box>
           </Box>
-        </Box>
-      </Container>
-    </Paper>
+        </Container>
+      </Paper>
+    </div>
   );
 }
