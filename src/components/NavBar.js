@@ -14,6 +14,7 @@ export default function NavBar() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
+  
   const { currentUser, logout } = useAuth();
 
   const [userProfile, setUserProfile] = useState(null);
