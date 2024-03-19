@@ -11,7 +11,6 @@ import { Typography } from "@mui/material";
 
 export default function NavBar() {
   const location = useLocation();
-  const [openFilter, setOpenFilter] = useState(false); // State to handle filter visibility
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
@@ -19,9 +18,6 @@ export default function NavBar() {
 
   const [userProfile, setUserProfile] = useState(null);
 
-  const handleCloseFilter = () => {
-    setOpenFilter(false);
-  };
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (currentUser?.uid) {
