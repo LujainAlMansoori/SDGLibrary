@@ -3,7 +3,7 @@ body {
     padding: 0; 
 }
 
-/* .navBar {
+.navBar {
     background-color: #a2cbe7;
     
     overflow: hidden;
@@ -14,7 +14,7 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     font-family: 'Tenor Sans', sans-serif;
     
-} */
+}
 
 
 .navBar ul {
@@ -42,14 +42,14 @@ body {
 .navBar li a:hover {
     color:  blue;
 }
-/* 
+
 .logo {
     padding-top:10px;
     padding-bottom:5px;
     height: 50px; 
     width: 100px;
     margin-left: 10px; 
-} */
+}
 
 .right-nav {
     float: right;

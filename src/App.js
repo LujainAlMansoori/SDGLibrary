@@ -53,8 +53,8 @@ function App() {
       <div>
         <BrowserRouter>
           <div className="app-container">
-            <NavBarSimple />
-            {/* <NavBar /> */}
+            {/* <NavBarSimple /> */}
+            <NavBar />
             <div className="main-content">
               <Routes>
                 <Route path="/" element={<Main />} />
