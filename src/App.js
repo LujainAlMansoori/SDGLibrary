@@ -28,6 +28,7 @@ import SearchPage from "./pages/SearchPage";
 
 import Footer from "./components/pageFooter.js";
 import { app } from "./firebase";
+import Settings from "./pages/Settings.jsx";
 
 function App() {
   const provider = new GoogleAuthProvider();
@@ -53,8 +54,8 @@ function App() {
       <div>
         <BrowserRouter>
           <div className="app-container">
-            {/* <NavBarSimple /> */}
-            <NavBar />
+            <NavBarSimple />
+            {/* <NavBar /> */}
             <div className="main-content">
               <Routes>
                 <Route path="/" element={<Main />} />
@@ -68,6 +69,7 @@ function App() {
                 <Route path="/AboutSDGLibrary" element={<AboutSDGLibrary />} />
                 <Route path="/aboutUs" element={<AboutUs />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/settings" element={<Settings />} />
                 <Route path="*" element={<NoPage />} />
               </Routes>
             </div>

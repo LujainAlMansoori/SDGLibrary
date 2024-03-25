@@ -16,7 +16,11 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 function NavItem({ label, link }) {
   return (
     <Link to={link}>
-      <Typography as="li" variant="small" className="p-1 font-medium text-black">
+      <Typography
+        as="li"
+        variant="small"
+        className="p-1 font-medium text-black"
+      >
         {label}
       </Typography>
     </Link>
@@ -93,7 +97,7 @@ function NavbarSimple() {
           </div>
         </div>
         <div className="lg:flex hidden items-center gap-2">
-        {currentUser ? (
+          {currentUser ? (
             <>
               {userProfile ? (
                 <>
@@ -152,64 +156,67 @@ function NavbarSimple() {
         </IconButton>
       </div>
       <Collapse open={open}>
-        <ul className="mb-4 mt-2 flex flex-col gap-3 lg:mb-0 lg:mt-2 lg:flex-row lg:items-center lg:gap-8">
-        <NavItem label="Home" link="/" />
-              {userProfile && userProfile.accountRole === "admin" && (
-                <NavItem label="Add Material" link="/NewMaterial" />
-              )}
-              <NavItem label="Search" link="/SearchResults" />
-              {currentUser &&
-                userProfile &&
-                userProfile.role &&
-                userProfile.firstName &&
-                userProfile.lastName && (
-                  <NavItem label="Members" link="/Researchers" />
-                )}
-        </ul>
-        
-        {currentUser ? (
-            <>
-              {userProfile ? (
-                <>
-                  <img
-                    src={
-                      userProfile.profileImage ||
-                      require("../components/assets/profile-photo.webp")
-                    }
-                    alt="Profile"
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      border: "1px solid #5c5b5b",
-                      boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
-                      borderRadius: "50%",
-                      marginRight: "10px",
-                    }}
-                  />
-                  <span style={{ marginRight: "10px" }}>
-                    {userProfile.title} {userProfile.firstName}{" "}
-                    {userProfile.lastName}
-                  </span>
-                  <MenuListComposition logout={logout} navigate={navigate} />{" "}
-                </>
-              ) : (
-                <Typography
-                  onClick={handleLogout}
-                  style={{ cursor: "pointer", marginRight: "10px" }}
-                >
-                  Log Out
-                </Typography>
-              )}
-            </>
-          ) : (
-            <Link
-              to="/Signup"
-              className="nav-link"
-              style={{ marginRight: "10px" }}
-            >
-              Sign In
-            </Link>
+        <ul
+          className="mb-4 mt-2 flex flex-col gap-3 lg:mb-0 lg:mt-2 lg:flex-row lg:items-center lg:gap-8"
+          onClick={handleOpen}
+        >
+          <NavItem label="Home" link="/" />
+          {userProfile && userProfile.accountRole === "admin" && (
+            <NavItem label="Add Material" link="/NewMaterial" />
           )}
+          <NavItem label="Search" link="/SearchResults" />
+          {currentUser &&
+            userProfile &&
+            userProfile.role &&
+            userProfile.firstName &&
+            userProfile.lastName && (
+              <NavItem label="Members" link="/Researchers" />
+            )}
+        </ul>
+
+        {currentUser ? (
+          <>
+            {userProfile ? (
+              <>
+                <img
+                  src={
+                    userProfile.profileImage ||
+                    require("../components/assets/profile-photo.webp")
+                  }
+                  alt="Profile"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    border: "1px solid #5c5b5b",
+                    boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
+                    borderRadius: "50%",
+                    marginRight: "10px",
+                  }}
+                />
+                <span style={{ marginRight: "10px" }}>
+                  {userProfile.title} {userProfile.firstName}{" "}
+                  {userProfile.lastName}
+                </span>
+                <MenuListComposition logout={logout} navigate={navigate} />{" "}
+              </>
+            ) : (
+              <Typography
+                onClick={handleLogout}
+                style={{ cursor: "pointer", marginRight: "10px" }}
+              >
+                Log Out
+              </Typography>
+            )}
+          </>
+        ) : (
+          <Link
+            to="/Signup"
+            className="nav-link"
+            style={{ marginRight: "10px" }}
+          >
+            Sign In
+          </Link>
+        )}
       </Collapse>
     </Navbar>
   );

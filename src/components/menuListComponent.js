@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Link } from "react-router-dom";
+
 import Button from "@mui/material/Button";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Grow from "@mui/material/Grow";
@@ -114,7 +116,10 @@ export default function MenuListComposition({ logout, navigate }) {
                   onKeyDown={handleListKeyDown}
                 >
                   <MenuItem onClick={handleModalOpen}>Profile</MenuItem>
-                  <MenuItem onClick={handleClose}>Settings</MenuItem>
+                  {/* //TODO: settings must appear only for admin */}
+                  <Link to="/settings" exact>
+                    <MenuItem onClick={handleClose}>Settings</MenuItem>
+                  </Link>
                   <MenuItem
                     onClick={(event) => {
                       handleLogout();

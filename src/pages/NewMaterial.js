@@ -74,8 +74,22 @@ export default function NewMaterial() {
   const [documentUrl, setDocumentUrl] = useState("");
   const [inputKey, setInputKey] = useState(Date.now());
   const [tagInput, setTagInput] = useState("");
-  const keywordsCsvUrl =
-    "https://firebasestorage.googleapis.com/v0/b/sdglibrary-dfc2c.appspot.com/o/keywords.csv?alt=media&token=3d65b7b6-31bc-4245-b777-30559570f050";
+  const [keywordsCsvUrl, setKeywordsCsvUrl] = useState("");
+
+  useEffect(() => {
+    const fetchKeywordsCsvUrl = async () => {
+      const settingsRef = storageRef(storage, "settings/keywords.csv");
+      try {
+        const url = await getDownloadURL(settingsRef);
+        setKeywordsCsvUrl(url);
+      } catch (error) {
+        console.error("Error fetching keywords.csv URL:", error);
+        setKeywordsCsvUrl("");
+      }
+    };
+
+    fetchKeywordsCsvUrl();
+  }, []);
 
   useEffect(() => {
     console.log("Document URL changed:", documentUrl);
@@ -96,7 +110,7 @@ export default function NewMaterial() {
   };
 
   const sdgMapping = sdglist.reduce((acc, item) => {
-    const [code, description] = item.split(' - ');
+    const [code, description] = item.split(" - ");
     acc[code.replace("SDG", "SDG ").trim()] = item; // Ensure format like "SDG 1" matches "SDG1"
     return acc;
   }, {});
@@ -207,8 +221,7 @@ export default function NewMaterial() {
       setTagInput(""); // Clear input field
     } else if (name === "tags") {
       //do nothing
-    }
-    else {
+    } else {
       setMaterialDetails({
         ...materialDetails,
         [name]: value,

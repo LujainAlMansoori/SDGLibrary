@@ -62,7 +62,7 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -d '{
     "pdfUrl": "https://firebasestorage.googleapis.com/v0/b/sdglibrary-dfc2c.appspot.com/o/documents%2FEducation_vs_austerity_English_online_2.pdf?alt=media&token=880d1f28-c897-4f2d-9fd9-d46220f25748",
-    "keywordsCsvUrl": "https://firebasestorage.googleapis.com/v0/b/sdglibrary-dfc2c.appspot.com/o/keywords.csv?alt=media&token=3d65b7b6-31bc-4245-b777-30559570f050"
+    "keywordsCsvUrl": "https://firebasestorage.googleapis.com/v0/b/sdglibrary-dfc2c.appspot.com/o/settings%2Fkeywords.csv?alt=media&token=96944a2d-94f1-487c-baeb-ad08e8e5f473"
   }'
 
 '''
