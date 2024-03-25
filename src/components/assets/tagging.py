@@ -56,6 +56,7 @@ categories = categorize_document_from_urls(pdf_url, keywords_csv_url)
 for category, details in categories:
     print(f"Category: {category}, Occurrences: {details['count']}, Matched Keywords: {', '.join(details['keywords'])}")
 
+
 '''
 curl -X POST \
   https://tag-pdf-dmyfoapmsq-uc.a.run.app \
