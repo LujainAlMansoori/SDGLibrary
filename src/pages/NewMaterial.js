@@ -33,6 +33,26 @@ const ListItem = styled("li")(({ theme }) => ({
   margin: theme.spacing(0.5),
 }));
 
+const sdglist = [
+  "SDG1 - No Poverty",
+  "SDG2 - Zero Hunger",
+  "SDG3 - Good Health and Well-being",
+  "SDG4 - Quality Education",
+  "SDG5 - Gender Equality",
+  "SDG6 - Clean Water and Sanitation",
+  "SDG7 - Affordable and Clean Energy",
+  "SDG8 - Decent Work and Economic Growth",
+  "SDG9 - Industry, Innovation, and Infrastructure",
+  "SDG10 - Reduced Inequality",
+  "SDG11 - Sustainable Cities and Communities",
+  "SDG12 - Responsible Consumption and Production",
+  "SDG13 - Climate Action",
+  "SDG14 - Life Below Water",
+  "SDG15 - Life on Land",
+  "SDG16 - Peace and Justice Strong Institutions",
+  "SDG17 - Partnerships to achieve the Goal",
+];
+
 export default function NewMaterial() {
   const [materialDetails, setMaterialDetails] = useState({
     title: "",
@@ -75,6 +95,11 @@ export default function NewMaterial() {
     });
   };
 
+  const sdgMapping = sdglist.reduce((acc, item) => {
+    const [code, description] = item.split(' - ');
+    acc[code.replace("SDG", "SDG ").trim()] = item; // Ensure format like "SDG 1" matches "SDG1"
+    return acc;
+  }, {});
   // Function that calls the tag_pdf Cloud Function and updates the state with tags
   const fetchAndSetTags = async (pdfUrl, keywordsCsvUrl) => {
     setIsProcessingTags(true);
@@ -93,9 +118,17 @@ export default function NewMaterial() {
       }
 
       const tagsData = await response.json();
-      const newTags = Object.entries(tagsData).flatMap(([category, keywords]) =>
-        keywords.map((keyword) => `${category}: ${keyword}`)
-      );
+      const newTags = [];
+
+      Object.entries(tagsData).forEach(([category, keywords]) => {
+        const fullCategoryName = sdgMapping[category]; // Map to full name
+        if (fullCategoryName) {
+          newTags.push(fullCategoryName); // Add the full SDG name
+          keywords.forEach((keyword) => {
+            newTags.push(keyword); // Add each keyword under the SDG
+          });
+        }
+      });
 
       setMaterialDetails((prevDetails) => ({
         ...prevDetails,
@@ -143,7 +176,7 @@ export default function NewMaterial() {
         }
         // Check if newFile is defined
         setFile(newFile);
-        const { name, value } = e.target;
+        // const { name, value } = e.target;
 
         setMaterialDetails({
           ...materialDetails,
@@ -172,8 +205,10 @@ export default function NewMaterial() {
       }
 
       setTagInput(""); // Clear input field
-    } else {
-      const { name, value } = e.target;
+    } else if (name === "tags") {
+      //do nothing
+    }
+    else {
       setMaterialDetails({
         ...materialDetails,
         [name]: value,
@@ -463,6 +498,7 @@ export default function NewMaterial() {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
+                    name="tags"
                     label="Press Enter to Add Tags"
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
