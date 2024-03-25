@@ -8,14 +8,14 @@ import { AuthProvider } from "./contexts/AuthContexts.js";
 import { GoogleAuthProvider } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import "./components/style/Footer.css";
-import Modal from "@mui/material/Modal";
 
 // Pages imported
 import SearchResults from "./pages/SearchResults.js";
 
 // Main is the home page
 import Main from "./pages/Main.js";
-import NewMaterial from "./pages/NewMaterial.js";
+import NewMaterial from "./pages/NewMaterial";
+import NewMaterial2 from "./pages/NewMaterial copy.jsx";
 import NoPage from "./pages/NoPage.js";
 import Researchers from "./pages/Researchers.js";
 import Signup from "./pages/Signup.js";
@@ -24,7 +24,6 @@ import CreateProfile from "./pages/createProfile.js";
 import AboutUs from "./pages/PageAboutUs.js";
 import AboutSDGLibrary from "./pages/AboutSDGLibrary.js";
 import SearchPage from "./pages/SearchPage";
-
 
 import Footer from "./components/pageFooter.js";
 import { app } from "./firebase";
@@ -60,8 +59,9 @@ function App() {
               <Routes>
                 <Route path="/" element={<Main />} />
                 <Route path="/home" element={<Main />} />
-                <Route path="/searchresults" element={<SearchResults />} />
+                {/* <Route path="/searchresults" element={<SearchResults />} /> */}
                 <Route path="/newmaterial" element={<NewMaterial />} />
+                {/* <Route path="/newmaterial" element={<NewMaterial2 />} /> */}
                 <Route path="/researchers" element={<Researchers />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="login" element={<Login />} />
@@ -76,7 +76,6 @@ function App() {
             <Footer />
           </div>
         </BrowserRouter>
-
       </div>
     </AuthProvider>
   );
