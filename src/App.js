@@ -2,7 +2,8 @@ import { onSnapshot, collection } from "@firebase/firestore";
 import { useEffect, useState } from "react";
 import db from "./firebase";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import NavBar from "./components/NavBar.js";
+import NavBarSimple from "./components/NavBar.js";
+import NavBar from "./components/NavBar copy.js";
 import { AuthProvider } from "./contexts/AuthContexts.js";
 import { GoogleAuthProvider } from "firebase/auth";
 import { getAuth } from "firebase/auth";
@@ -52,6 +53,7 @@ function App() {
       <div>
         <BrowserRouter>
           <div className="app-container">
+            {/* <NavBarSimple /> */}
             <NavBar />
             <div className="main-content">
               <Routes>
