@@ -23,6 +23,7 @@ import CreateProfile from "./pages/createProfile.js";
 import AboutUs from "./pages/PageAboutUs.js";
 import AboutSDGLibrary from "./pages/AboutSDGLibrary.js";
 import SearchPage from "./pages/SearchPage";
+import EditProfile from "./pages/EditProfile";
 
 
 import Footer from "./components/pageFooter.js";
@@ -66,6 +67,7 @@ function App() {
                 <Route path="/AboutSDGLibrary" element={<AboutSDGLibrary />} />
                 <Route path="/aboutUs" element={<AboutUs />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/editProfile" element={<EditProfile />} />
                 <Route path="*" element={<NoPage />} />
               </Routes>
             </div>

@@ -43,7 +43,11 @@ export default function MenuListComposition({ logout, navigate }) {
     }
   };
   const handleClose = (event) => {
-    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+    if (
+      event &&
+      anchorRef.current &&
+      anchorRef.current.contains(event.target)
+    ) {
       return;
     }
     setOpen(false);
@@ -113,7 +117,14 @@ export default function MenuListComposition({ logout, navigate }) {
                   aria-labelledby="composition-button"
                   onKeyDown={handleListKeyDown}
                 >
-                  <MenuItem onClick={handleModalOpen}>Profile</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      navigate("/editProfile");
+                      handleClose();
+                    }}
+                  >
+                    Profile
+                  </MenuItem>
                   <MenuItem onClick={handleClose}>Settings</MenuItem>
                   <MenuItem
                     onClick={(event) => {
