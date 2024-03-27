@@ -82,7 +82,7 @@ export default function MenuListComposition({ logout, navigate }) {
         sx={{
           minWidth: 0, // Remove padding
           padding: 0, // Remove padding
-          marginRight: 2,
+          marginRight: { xs: 1, sm: 2 },
           "&:hover": {
             bgcolor: "transparent", // Remove hover background color
           },
@@ -96,6 +96,7 @@ export default function MenuListComposition({ logout, navigate }) {
             color: "black",
             transform: open ? "rotate(180deg)" : "rotate(0deg)",
             transition: "transform 0.3s",
+            fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem", lg: "3rem" },
           }}
         />
       </Button>
@@ -105,7 +106,12 @@ export default function MenuListComposition({ logout, navigate }) {
         role={undefined}
         placement="bottom-start"
         transition
-        style={{ zIndex: 2000 }}
+        style={{
+          zIndex: 2000,
+          width: "auto",
+          maxHeight: "calc(60vh + 20px)",
+          overflow: "auto",
+        }}
       >
         {({ TransitionProps }) => (
           <Grow {...TransitionProps}>
@@ -116,6 +122,11 @@ export default function MenuListComposition({ logout, navigate }) {
                   id="composition-menu"
                   aria-labelledby="composition-button"
                   onKeyDown={handleListKeyDown}
+                  sx={{
+                    "& .MuiMenuItem-root": {
+                      fontSize: "calc(0.8rem + 0.5vw)", // Responsive font size based on viewport width
+                    },
+                  }}
                 >
                   <MenuItem
                     onClick={() => {
@@ -140,17 +151,6 @@ export default function MenuListComposition({ logout, navigate }) {
           </Grow>
         )}
       </Popper>
-      <Modal
-        open={modalOpen}
-        onClose={handleModalClose}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
-      >
-        <div style={{ backgroundColor: "white", padding: 20 }}>
-          <h2 id="modal-title">Modal Title</h2>
-          <p id="modal-description">This is the modal content.</p>
-        </div>
-      </Modal>
     </div>
   );
 }

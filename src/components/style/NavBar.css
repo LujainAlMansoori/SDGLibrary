@@ -1,6 +1,6 @@
-body {
-    margin: 0; 
-    padding: 0; 
+html, body {
+    margin: 0;
+    padding: 0;
 }
 
 .navBar {
@@ -8,10 +8,11 @@ body {
     overflow: hidden;
     display: flex; 
     align-items: center;
-    justify-content: space-between; /* Changed from flex-start to space-between */
+    justify-content: space-between;
     z-index: 1000000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     font-family: 'Tenor Sans', sans-serif;
+    padding: 2vh 4vw;
 }
 
 .navBar ul {
@@ -29,9 +30,9 @@ body {
     display: inline-block; 
     color: black;
     text-align: center;
-    padding: 14px 16px;
+    padding: 3.5vh 1.6vw; 
     text-decoration: none;
-    margin-right: 10px;
+    margin-right: 1vw;
 }
 
 .navBar li a:hover {
@@ -39,22 +40,35 @@ body {
 }
 
 .logo {
-    padding-top: 10px;
-    padding-bottom: 5px;
-    height: 50px; 
-    width: 100px;
-    margin-left: 10px; 
+    padding-top: 1vh;
+    padding-bottom: 0.5vh;
+    height: 6vh; 
+    width: auto;
+    margin-left: 1vw; 
 }
 
 .right-nav {
     display: flex;
 }
 
+.navBar a {
+    font-size: calc(0.8rem + 0.5vw);
+
+}
+
+.navBar span {
+    font-size: calc(0.8rem + 0.5vw); 
+
+}
+
+
+
 /* Media query for screens smaller than 768px */
 @media (max-width: 768px) {
     .navBar {
         flex-direction: column;
         align-items: flex-start;
+        padding: 2vh 4vw; 
     }
 
     .navBar ul {
@@ -69,5 +83,6 @@ body {
 
     .logo {
         margin: 0 auto; /* Center the logo */
+        height: 7vh; 
     }
 }

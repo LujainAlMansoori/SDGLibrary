@@ -86,7 +86,7 @@ export default function NavBar() {
               margin: 0,
             }}
           >
-            <li style={{ mmarginRight: "10px" }}>
+            <li>
               <Link to="/">Home</Link>
             </li>
             {userProfile && userProfile.accountRole === "admin" && (
@@ -94,7 +94,7 @@ export default function NavBar() {
                 <Link to="/NewMaterial">Add Material</Link>
               </li>
             )}
-            <li style={{ marginRight: "10px" }}>
+            <li>
               <Link to="/SearchResults">Search</Link>
             </li>
             {currentUser &&
@@ -102,7 +102,7 @@ export default function NavBar() {
               userProfile.role &&
               userProfile.firstName &&
               userProfile.lastName && (
-                <li style={{ marginRight: "10px" }}>
+                <li>
                   <Link to="/Researchers">Members</Link>
                 </li>
               )}
@@ -122,8 +122,8 @@ export default function NavBar() {
                     }
                     alt="Profile"
                     style={{
-                      width: "40px",
-                      height: "40px",
+                      width: "calc(2vw + 20px)",
+                      height: "calc(2vw + 20px)",
                       border: "1px solid #5c5b5b",
                       boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
                       borderRadius: "50%",

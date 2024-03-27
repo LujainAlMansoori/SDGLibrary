@@ -2,7 +2,7 @@
 
 
 .researchers-title {
-  font-size: calc(1.5rem + 2vw); /* Base size + a percentage of the viewport width */
+  font-size: calc(2.5rem + 2vw);
   font-weight: bold;
   margin-top: 6%;
   margin-bottom:5%;
