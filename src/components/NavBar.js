@@ -22,9 +22,7 @@ export default function NavBar() {
   // const [ setUserProfile] = useState(null);
 
   const { userProfile } = useUserProfile();
-console.log("User Profile:", userProfile);
-
- 
+  console.log("User Profile:", userProfile);
 
   const handleCloseFilter = () => {
     setOpenFilter(false);

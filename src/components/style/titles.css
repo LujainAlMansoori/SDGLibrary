@@ -1,13 +1,23 @@
+
+
+
 .researchers-title {
-  font-size: 3.5rem;
+  font-size: calc(1.5rem + 2vw); /* Base size + a percentage of the viewport width */
   font-weight: bold;
-  margin-top: '400px';
-  padding: 15px;
+  margin-top: 6%;
+  margin-bottom:5%;
+  
   display: flex;
   justify-content: center;
-  align-items: center;   
+  align-items: center;
   font-family: 'Tenor Sans', sans-serif;
   color: #153363;
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 600px) {
+  .researchers-title {
+    font-size: calc(1.2rem + 3vw); /* Increase the relative size on smaller screens */
   
-  
+  }
 }

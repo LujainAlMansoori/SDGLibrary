@@ -1003,8 +1003,8 @@ export default function Researchers() {
 
     alignItems: "center",
     justifyContent: "space-between",
-    width: "calc(25% - 30px)",
-    height: 400,
+    width: "25vw",
+    height: "auto",
     backgroundColor: "#F8FAFB",
   };
 
@@ -1047,7 +1047,7 @@ export default function Researchers() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
-                width: 900,
+                width: "60vw",
                 marginTop: "-20px",
                 marginBottom: "40px",
               }}
@@ -1142,7 +1142,7 @@ export default function Researchers() {
             </Box>
           </Modal>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", cursor: "pointer" }}>
+        <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
           {filteredProfiles.map((profile, index) => (
             <Paper
               key={index}
@@ -1165,13 +1165,17 @@ export default function Researchers() {
                   border: "0.5px solid #393939",
                   boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
                   borderRadius: "50%",
-                  marginTop: "70px",
 
-                  width: "150px",
-                  height: "150px",
+                  // marginTop: "70px",
+
+                  marginTop: "20%", // Relative to the parent container
+                  width: "50%", // Relative to the parent container
+                  height: "75%", // Relative to the parent container
+                  // width: "15vw",
+                  // height: "15vw",
                 }}
               />
-              <div style={{ textAlign: "center", padding: "10px" }}>
+              <div style={{ textAlign: "center", padding: "5%" }}>
                 <div
                   style={{
                     display: "flex",
@@ -1179,19 +1183,21 @@ export default function Researchers() {
                     alignItems: "center",
                     cursor: "pointer",
                     fontWeight: "bold",
-                    marginTop: "-150px",
-                    fontSize: "18px",
+                    marginTop: "10%",
+                    fontSize: "1em",
                   }}
                 >
-                  <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
+                  <div style={{ fontWeight: "bold", marginBottom: "5%" }}>
                     {profile.title}
                   </div>
                   <div
-                    style={{ marginLeft: "5px", marginBottom: "5px" }}
+                    style={{ marginLeft: "5px", marginBottom: "5%" }}
                   >{`${profile.firstName} ${profile.lastName}`}</div>
                 </div>
 
-                <div style={{ cursor: "pointer" }}>{profile.role}</div>
+                <div style={{ cursor: "pointer", marginBottom: "15%" }}>
+                  {profile.role}
+                </div>
               </div>
 
               {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 <=
@@ -1207,13 +1213,14 @@ export default function Researchers() {
                   }}
                   style={{
                     position: "absolute",
-                    top: "10px",
-                    right: "10px",
+                    top: "5%",
+                    right: "5%",
+
                     cursor: "pointer",
                     fontFamily: "Tensor Sans",
                     color: "black",
+                    fontSize: "1em",
 
-                    fontSize: "16px",
                     // Remove any box-shadow or border that might appear on hover
                     "&:hover": {
                       backgroundColor: "transparent",
@@ -1230,8 +1237,9 @@ export default function Researchers() {
                       },
                     }}
                     style={{
+                      fontSize: "1.5em",
                       color: "black",
-                      marginLeft: "5px",
+                      marginLeft: "5%",
                       // Remove any box-shadow or border that might appear on hover
                       "&:hover": {
                         backgroundColor: "transparent",
@@ -1258,14 +1266,18 @@ export default function Researchers() {
                   }}
                   style={{
                     position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    cursor: "not-allowed",
+                    top: "5%",
+                    right: "5%",
+                    marginBottom: "15%",
+                    cursor: "pointer",
                     fontFamily: "Tensor Sans",
                     color: "grey",
-                    fontSize: "16px",
+                    fontSize: "1em",
+                    // Remove any box-shadow or border that might appear on hover
                     "&:hover": {
                       backgroundColor: "transparent",
+                      boxShadow: "none",
+                      border: "none",
                     },
                   }}
                 >
@@ -1288,10 +1300,14 @@ export default function Researchers() {
                       },
                     }}
                     style={{
+                      fontSize: "1.5em",
                       color: "grey",
-                      marginLeft: "5px",
+                      marginLeft: "5%",
+                      // Remove any box-shadow or border that might appear on hover
                       "&:hover": {
                         backgroundColor: "transparent",
+                        boxShadow: "none",
+                        border: "none",
                       },
                     }}
                   />

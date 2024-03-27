@@ -397,30 +397,6 @@ export default function EditProfile() {
                     </FormGroup>
                   </Paper>
                 </Grid>
-
-                {/* <Grid item xs={12}>
-              <input
-                accept="image/*"
-                type="file"
-                ref={profileImageInputRef}
-                onChange={handleProfileImageChange}
-                style={{ display: "none" }}
-              />
-              <IconButton
-                color="primary"
-                aria-label="upload picture"
-                component="span"
-                onClick={handleProfileImageClick}
-              >
-                <PhotoCamera />
-              </IconButton>
-              {profileImage && (
-                <Avatar
-                  src={profileImage}
-                  sx={{ width: 100, height: 100, mt: 2 }}
-                />
-              )}
-            </Grid> */}
               </Grid>
               <Button
                 type="submit"
