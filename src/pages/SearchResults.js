@@ -214,6 +214,12 @@ export default function SearchResults() {
               marginTop: "-20px",
               marginBottom: "40px",
             }}
+            InputLabelProps={{
+              style: {
+                fontSize: "calc(0.2rem + 1vw)",
+                backgroundColor: "#fff",
+              },
+            }}
             sx={{
               borderRadius: "20px",
               "& .MuiOutlinedInput-root": {

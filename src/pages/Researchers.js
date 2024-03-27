@@ -1067,7 +1067,6 @@ export default function Researchers() {
               style={{
                 width: "70vw",
                 marginTop: "-20px",
-
                 "& .MuiInputBase-input": {
                   fontSize: "calc(100rem + 1vw)",
                 },
@@ -1075,10 +1074,12 @@ export default function Researchers() {
               InputLabelProps={{
                 style: {
                   fontSize: "calc(0.2rem + 1vw)",
+                  padding: "1%",
+                  marginRight: "5%",
+                  marginLeft: "1%",
+                  marginTop: "-1.2%",
 
-                  top: "5%", // Position the label in the center vertically
-                  //  transform: "translateY(-50%)", // Adjust the label to be exactly in the middle
-                  marginLeft: "0.5%",
+                  backgroundColor: "#fff",
                 },
               }}
               sx={{
