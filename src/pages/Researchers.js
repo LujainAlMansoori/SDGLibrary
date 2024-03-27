@@ -1054,7 +1054,9 @@ export default function Researchers() {
 
           <div
             style={{
-              marginBottom: "60px",
+              marginTop: "-1%",
+              marginBottom: "4%",
+
               display: "flex",
               justifyContent: "center",
             }}

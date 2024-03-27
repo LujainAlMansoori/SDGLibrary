@@ -198,7 +198,8 @@ export default function SearchResults() {
       <div className="flex flex-col items-center justify-center">
         <div
           style={{
-            marginBottom: "60px",
+            marginTop: "-1%",
+            marginBottom: "4%",
             display: "flex",
             justifyContent: "center",
           }}
@@ -210,20 +211,45 @@ export default function SearchResults() {
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyPress={handleKeyPress}
             style={{
-              width: 900,
+              width: "70vw",
               marginTop: "-20px",
-              marginBottom: "40px",
+
+              "& .MuiInputBase-input": {
+                fontSize: "calc(100rem + 1vw)",
+              },
+            }}
+            InputLabelProps={{
+              style: {
+                fontSize: "calc(0.2rem + 1vw)",
+
+                top: "5%", // Position the label in the center vertically
+                //  transform: "translateY(-50%)", // Adjust the label to be exactly in the middle
+                marginLeft: "0.5%",
+              },
             }}
             sx={{
-              borderRadius: "20px",
               "& .MuiOutlinedInput-root": {
-                borderRadius: "25px",
+                borderRadius: "25vw",
+                height: "4vw",
+                padding: "0 14px",
+              },
+              "& .MuiInputBase-input": {
+                fontSize: "calc(0.4rem + 1vw)", // Responsive font size for the input
+                marginLeft: "2%",
               },
             }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={handleSearch}>
+                  <IconButton
+                    sx={{
+                      // Adjust icon size similarly if needed, or use a fixed size
+                      "& .MuiSvgIcon-root": {
+                        fontSize: "calc(1rem + 1vw)",
+                      },
+                    }}
+                    onClick={handleSearch}
+                  >
                     <SearchIcon />
                   </IconButton>
                 </InputAdornment>
@@ -233,70 +259,81 @@ export default function SearchResults() {
         </div>
 
         {/* SDG Images Mapping */}
-        {/* SDG Images Mapping */}
-
-        {/* SDG Images Mapping */}
-        <div className="flex flex-wrap justify-center mt-5 w-full">
-          {sdgImages.map((imagePath, index) => (
-            <Link
-              to={`/search?query=${encodeURIComponent(sdgTags[index])}`}
-              key={index}
-              onMouseEnter={(e) => showTooltip(index, e)}
-              onMouseLeave={hideTooltip}
-              style={{
-                position: "relative",
-                width: "100%",
-                paddingLeft: index % 4 === 0 ? "110px" : "10px",
-              }}
-            >
-              <img
-                src={imagePath}
-                alt={`SDG ${index + 1}`}
+        <div className="flex justify-center w-full">
+          <div
+            className="mt-5"
+            style={{ maxWidth: "calc(100% - 2vw)", margin: "0 auto" }}
+          >
+            {sdgImages.map((imagePath, index) => (
+              <Link
+                to={`/search?query=${encodeURIComponent(sdgTags[index])}`}
+                key={index}
+                onMouseEnter={(e) => showTooltip(index, e)}
+                onMouseLeave={hideTooltip}
                 style={{
-                  width: "calc((100% / 4) - 90px)",
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  boxShadow: "2px 4px 10px rgba(0, 0, 2, 0.2)",
-                  zIndex: 500,
-                }}
-              />
-              <IconButton
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleTooltipToggle(index, e);
-                }}
-                style={{
-                  position: "absolute",
-                  top: "-260px",
-                  right: "5px",
-                  color: "white",
-                  cursor: "pointer",
-                  backgroundColor: "transparent",
-                  borderRadius: "50%",
-                  zIndex: 600,
+                  position: "relative",
+                  width: "100%",
+                  padding: "0.5%",
+                  paddingLeft: index % 4 === 0 ? "calc(4% + 0.4vw)" : "0",
                 }}
               >
-                <InfoIcon />
-              </IconButton>
-              {tooltip.show && tooltip.index === index && (
-                <div
+                <img
+                  src={imagePath}
+                  alt={`SDG ${index + 1}`}
                   style={{
-                    color: "black",
+                    // width: "calc((100% / 4) - 90px)",
+                    width: "calc((100% / 4) - 4vw)",
+                    borderRadius: "5%",
+                    cursor: "pointer",
+                    boxShadow: "2px 4px 10px rgba(0, 0, 2, 0.2)",
+                    zIndex: 500,
+                    margin: "0.5%",
+                  }}
+                />
+                <IconButton
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleTooltipToggle(index, e);
+                  }}
+                  style={{
                     position: "absolute",
-                    top: "-225px",
-                    right: "0px",
-                    backgroundColor: "white",
-                    padding: "10px",
-                    borderRadius: "5px",
-                    zIndex: 1000,
-                    maxWidth: "20ch",
+                    top: "-2.4vw",
+                    right: "1.4vw",
+                    color: "white",
+                    cursor: "pointer",
+                    backgroundColor: "transparent",
+                    borderRadius: "50%",
+                    zIndex: 600,
                   }}
                 >
-                  {tooltip.text}
-                </div>
-              )}
-            </Link>
-          ))}
+                  <InfoIcon
+                    style={{
+                      fontSize: "calc(1.5vw )", // Adjust the size based on viewport width
+                    }}
+                  />
+                </IconButton>
+                {tooltip.show && tooltip.index === index && (
+                  <div
+                    style={{
+                      color: "black",
+                      fontSize: "1vw",
+                      position: "absolute",
+                      top: "-1.5vw",
+                      right: "0px",
+                      backgroundColor: "white",
+                      padding: "10px",
+                      borderRadius: "5px",
+                      zIndex: 1000,
+                      maxWidth: "20ch",
+                      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                    }}
+                  >
+                    {tooltip.text}
+                  </div>
+                )}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>
