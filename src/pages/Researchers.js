@@ -10,6 +10,8 @@ import "../components/style/noHover.css";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import emailjs from "emailjs-com";
 import { useAuth } from "../contexts/AuthContexts";
+
+import { useContactStatus } from "../contexts/ContactContext.js";
 import { Typography, Link } from "@mui/material";
 import Button from "@mui/material/Button";
 import { doc, getDoc } from "firebase/firestore";
@@ -53,6 +55,11 @@ const ProfileInfoPopup = ({
   });
 
   const { currentUser } = useAuth();
+  const { contactDisabled } = useContactStatus();
+  const isContactDisabled =
+    contactDisabled[profile.id] ||
+    emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 >= maxEmails;
+
   const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);
   const [sdgTooltip, setSdgTooltip] = useState({
     show: false,
@@ -160,7 +167,7 @@ const ProfileInfoPopup = ({
     };
     return (
       <div style={{ display: "flex", flexWrap: "wrap" }}>
-        {researchInterests.map((interest, index) => {
+        {sortedInterests.map((interest, index) => {
           const sdgNumber = interest.match(/SDG(\d+)/)[1];
           return (
             <ClickAwayListener onClickAway={hideSdgTooltip} key={index}>
@@ -246,9 +253,12 @@ const ProfileInfoPopup = ({
         X
       </button>
 
-      {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 < maxEmails ? (
+      {/*this is the email icon for the profile pop up */}
+      {!contactDisabled ? (
         <IconButton
-          onClick={(event) => handleContactClick(event, profile)}
+          onClick={(event) =>
+            !isContactDisabled && handleContactClick(event, profile)
+          }
           className="noHoverEffect"
           style={{
             position: "absolute",
@@ -264,6 +274,7 @@ const ProfileInfoPopup = ({
               boxShadow: "none",
             },
           }}
+          disabled={!contactDisabled}
         >
           Contact{" "}
           <EmailOutlinedIcon
@@ -486,7 +497,7 @@ const ProfilePopup = ({
   setShowContactButton,
 }) => {
   //State variables to keep track of the amount of emails sent to another user
-
+  const { disableContact } = useContactStatus();
   const { currentUser } = useAuth();
   const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);
   const senderEmail = profileofCurrentUser?.email; // Email of the current logged-in user
@@ -537,6 +548,9 @@ const ProfilePopup = ({
     e.preventDefault();
 
     if (emailCount >= maxEmails) {
+      console.log(`Disabling contact for profile ID: ${profile.id}`);
+      disableContact(profile.id);
+
       alert(
         "You cannot contact them anymore, you have already sent three emails."
       );
@@ -556,6 +570,8 @@ const ProfilePopup = ({
           const newCount = emailCount + 1;
           setEmailCount(newCount);
           if (newCount >= maxEmails) {
+            disableContact(profile.id);
+            console.log(`Disabling contact for profile ID: ${profile.id}`);
             setErrorMessage({
               text: "You have already contacted them three times. Please wait until they reply.",
               show: true,
@@ -648,7 +664,6 @@ const ProfilePopup = ({
         X
       </button>
       {/* Popup content  */}
-
       <div>
         <Typography
           type="submit"
@@ -775,6 +790,8 @@ const ProfilePopup = ({
 
 export default function Researchers() {
   const location = useLocation();
+
+  const { contactDisabled, disableContact, enableContact } = useContactStatus();
   const [showProfileAlert, setShowProfileAlert] = useState(false);
 
   const navigate = useNavigate();
@@ -907,6 +924,8 @@ export default function Researchers() {
   const handleContactClick = (event, profile) => {
     event.stopPropagation();
     if (emailCounts[profile.id] >= maxEmails) {
+      disableContact(profile.id);
+
       setErrorMessage({
         text: "You have already contacted them three times. You cannot contact them anymore.",
         show: true,
@@ -1178,6 +1197,7 @@ export default function Researchers() {
               {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 <=
                 maxEmails && showContactButton[profile.id] !== false ? (
                 <IconButton
+                  disabled={contactDisabled[profile.id]}
                   onClick={(event) => handleContactClick(event, profile)}
                   className="noHoverEffect"
                   sx={{

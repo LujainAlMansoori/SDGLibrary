@@ -10,6 +10,7 @@ import "./components/style/Footer.css";
 
 import Modal from "@mui/material/Modal";
 import { UserProfileProvider } from "./contexts/UserProfileContexts.js";
+import { ContactProvider } from "./contexts/ContactContext.js";
 
 // Pages imported
 import SearchResults from "./pages/SearchResults.js";
@@ -52,34 +53,36 @@ function App() {
     // Below shows the navigation bar and sets the routes of every page
     <AuthProvider>
       <UserProfileProvider>
-        <div>
-          <BrowserRouter>
-            <div className="app-container">
-              <NavBar />
-              <div className="main-content">
-                <Routes>
-                  <Route path="/" element={<Main />} />
-                  <Route path="/home" element={<Main />} />
-                  <Route path="/searchresults" element={<SearchResults />} />
-                  <Route path="/newmaterial" element={<NewMaterial />} />
-                  <Route path="/researchers" element={<Researchers />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="login" element={<Login />} />
-                  <Route path="/createprofile" element={<CreateProfile />} />
-                  <Route
-                    path="/AboutSDGLibrary"
-                    element={<AboutSDGLibrary />}
-                  />
-                  <Route path="/aboutUs" element={<AboutUs />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/editProfile" element={<EditProfile />} />
-                  <Route path="*" element={<NoPage />} />
-                </Routes>
+        <ContactProvider>
+          <div>
+            <BrowserRouter>
+              <div className="app-container">
+                <NavBar />
+                <div className="main-content">
+                  <Routes>
+                    <Route path="/" element={<Main />} />
+                    <Route path="/home" element={<Main />} />
+                    <Route path="/searchresults" element={<SearchResults />} />
+                    <Route path="/newmaterial" element={<NewMaterial />} />
+                    <Route path="/researchers" element={<Researchers />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="login" element={<Login />} />
+                    <Route path="/createprofile" element={<CreateProfile />} />
+                    <Route
+                      path="/AboutSDGLibrary"
+                      element={<AboutSDGLibrary />}
+                    />
+                    <Route path="/aboutUs" element={<AboutUs />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/editProfile" element={<EditProfile />} />
+                    <Route path="*" element={<NoPage />} />
+                  </Routes>
+                </div>
+                <Footer />
               </div>
-              <Footer />
-            </div>
-          </BrowserRouter>
-        </div>
+            </BrowserRouter>
+          </div>
+        </ContactProvider>
       </UserProfileProvider>
     </AuthProvider>
   );
