@@ -7,6 +7,7 @@ import { AuthProvider } from "./contexts/AuthContexts.js";
 import { GoogleAuthProvider } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import "./components/style/Footer.css";
+import { UserProfileProvider } from "./contexts/UserProfileContexts.js";
 import Modal from "@mui/material/Modal";
 
 // Pages imported
@@ -24,7 +25,6 @@ import AboutUs from "./pages/PageAboutUs.js";
 import AboutSDGLibrary from "./pages/AboutSDGLibrary.js";
 import SearchPage from "./pages/SearchPage";
 import EditProfile from "./pages/EditProfile";
-
 
 import Footer from "./components/pageFooter.js";
 import { app } from "./firebase";
@@ -49,34 +49,38 @@ function App() {
 
   return (
     // Below shows the navigation bar and sets the routes of every page
-    <AuthProvider>
-      <div>
-        <BrowserRouter>
-          <div className="app-container">
-            <NavBar />
-            <div className="main-content">
-              <Routes>
-                <Route path="/" element={<Main />} />
-                <Route path="/home" element={<Main />} />
-                <Route path="/searchresults" element={<SearchResults />} />
-                <Route path="/newmaterial" element={<NewMaterial />} />
-                <Route path="/researchers" element={<Researchers />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="login" element={<Login />} />
-                <Route path="/createprofile" element={<CreateProfile />} />
-                <Route path="/AboutSDGLibrary" element={<AboutSDGLibrary />} />
-                <Route path="/aboutUs" element={<AboutUs />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/editProfile" element={<EditProfile />} />
-                <Route path="*" element={<NoPage />} />
-              </Routes>
-            </div>
-            <Footer />
-          </div>
-        </BrowserRouter>
 
-      </div>
-    </AuthProvider>
+      <AuthProvider>
+        <div>
+          <BrowserRouter>
+            <div className="app-container">
+              <NavBar />
+              <div className="main-content">
+                <Routes>
+                  <Route path="/" element={<Main />} />
+                  <Route path="/home" element={<Main />} />
+                  <Route path="/searchresults" element={<SearchResults />} />
+                  <Route path="/newmaterial" element={<NewMaterial />} />
+                  <Route path="/researchers" element={<Researchers />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="/createprofile" element={<CreateProfile />} />
+                  <Route
+                    path="/AboutSDGLibrary"
+                    element={<AboutSDGLibrary />}
+                  />
+                  <Route path="/aboutUs" element={<AboutUs />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/editProfile" element={<EditProfile />} />
+                  <Route path="*" element={<NoPage />} />
+                </Routes>
+              </div>
+              <Footer />
+            </div>
+          </BrowserRouter>
+        </div>
+      </AuthProvider>
+
   );
 }
 

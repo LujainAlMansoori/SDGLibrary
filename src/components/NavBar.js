@@ -9,8 +9,10 @@ import MenuListComposition from "./menuListComponent.js";
 import Modal from "@mui/material/Modal";
 import { Typography } from "@mui/material";
 
+
 export default function NavBar() {
   const location = useLocation();
+
   const [openFilter, setOpenFilter] = useState(false); // State to handle filter visibility
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -18,6 +20,7 @@ export default function NavBar() {
   const { currentUser, logout } = useAuth();
 
   const [userProfile, setUserProfile] = useState(null);
+
 
   const handleCloseFilter = () => {
     setOpenFilter(false);
