@@ -8,7 +8,7 @@ import "./style/NavBar.css";
 import MenuListComposition from "./menuListComponent.js";
 import Modal from "@mui/material/Modal";
 import { Typography } from "@mui/material";
-
+import { useUserProfile } from "../contexts/UserProfileContexts.js";
 
 export default function NavBar() {
   const location = useLocation();
@@ -19,27 +19,31 @@ export default function NavBar() {
 
   const { currentUser, logout } = useAuth();
 
-  const [userProfile, setUserProfile] = useState(null);
+  // const [ setUserProfile] = useState(null);
 
+  const { userProfile } = useUserProfile();
+console.log("User Profile:", userProfile);
+
+ 
 
   const handleCloseFilter = () => {
     setOpenFilter(false);
   };
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (currentUser?.uid) {
-        const docRef = doc(db, "profiles", currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setUserProfile(docSnap.data());
-        } else {
-          console.log("No such document!");
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUserProfile = async () => {
+  //     if (currentUser?.uid) {
+  //       const docRef = doc(db, "profiles", currentUser.uid);
+  //       const docSnap = await getDoc(docRef);
+  //       if (docSnap.exists()) {
+  //         setUserProfile(docSnap.data());
+  //       } else {
+  //         console.log("No such document!");
+  //       }
+  //     }
+  //   };
 
-    fetchUserProfile();
-  }, [currentUser, location.pathname]);
+  //   fetchUserProfile();
+  // }, [currentUser, location.pathname]);
 
   const handleLogout = async () => {
     try {

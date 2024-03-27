@@ -38,7 +38,6 @@ export default function EditProfile() {
   const [loading, setLoading] = useState(false);
   const profileImageInputRef = useRef(null);
   const [profileImage, setProfileImage] = useState(null);
-  
 
   const [initialProfile, setInitialProfile] = useState(null);
 
@@ -120,7 +119,6 @@ export default function EditProfile() {
       profileImage !== initialProfile.profileImage
     );
   };
-
   const handleProfileImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       setProfileImage(URL.createObjectURL(event.target.files[0]));
@@ -130,6 +128,8 @@ export default function EditProfile() {
   const handleProfileImageClick = () => {
     profileImageInputRef.current.click();
   };
+
+  const { setUserProfile } = useUserProfile();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -159,15 +159,18 @@ export default function EditProfile() {
 
     try {
       await updateDoc(doc(db, "profiles", currentUser.uid), updatedProfile);
+      setUserProfile(updatedProfile);
       setConfirmMessage({
-        text: "Profile updated successfully",
+        text: "Profile updated successfully.",
         show: true,
       });
+      // Reset initial profile to reflect the updates for comparison
+      setInitialProfile(updatedProfile);
       setTimeout(() => setConfirmMessage({ text: "", show: false }), 5000);
     } catch (error) {
       console.error("Error updating profile:", error);
       setErrorMessage({
-        text: "Error updating profile",
+        text: "Error updating profile.",
         show: true,
       });
       setTimeout(() => setErrorMessage({ text: "", show: false }), 5000);
@@ -177,33 +180,75 @@ export default function EditProfile() {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
-      {profile ? (
-        <Paper elevation={4} sx={{ p: 4, mt: 4 }}>
-          <Typography component="h1" variant="h5">
-            Edit Profile
-          </Typography>
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 3 }}
-          >
-            <Grid container spacing={2}>
-              <Grid item xs={9}>
-                <Grid container spacing={2}>
-                  <Grid item xs={3}>
-                    <FormControl fullWidth required>
-                      <InputLabel id="demo-simple-select-label">
-                        Title
-                      </InputLabel>
-                      <Select
-                        labelId="title-select-label"
-                        id="title-select"
-                        name="title"
-                        value={profile.title}
-                        label="Title"
+    <div>
+      {confirmMessage.show && (
+        <div className="confirmMessage">
+          <Typography>{confirmMessage.text}</Typography>
+        </div>
+      )}
+
+      {errorMessage.show && (
+        <div className="errorMessage">
+          <Typography>{errorMessage.text}</Typography>
+        </div>
+      )}
+
+      <Container component="main" maxWidth="sm">
+        {profile ? (
+          <Paper elevation={4} sx={{ p: 4, mt: 4 }}>
+            <Typography component="h1" variant="h5">
+              Edit Profile
+            </Typography>
+            <Box
+              component="form"
+              noValidate
+              onSubmit={handleSubmit}
+              sx={{ mt: 3 }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={9}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={3}>
+                      <FormControl fullWidth required>
+                        <InputLabel id="demo-simple-select-label">
+                          Title
+                        </InputLabel>
+                        <Select
+                          labelId="title-select-label"
+                          id="title-select"
+                          name="title"
+                          value={profile.title}
+                          label="Title"
+                          onChange={handleChange}
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              "&.Mui-focused fieldset": {
+                                borderColor: "black",
+                              },
+                            },
+                          }}
+                        >
+                          {profile.title && (
+                            <MenuItem value={profile.title}>
+                              {profile.title}
+                            </MenuItem>
+                          )}
+                          <MenuItem value={"Ms."}>Ms.</MenuItem>
+                          <MenuItem value={"Mr."}>Mr.</MenuItem>
+                          <MenuItem value={"Dr."}>Dr.</MenuItem>
+                          <MenuItem value={"Prof."}>Prof.</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4.5}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="firstName"
+                        value={profile.firstName}
                         onChange={handleChange}
+                        label="First Name"
+                        autoComplete="given-name"
                         sx={{
                           "& .MuiOutlinedInput-root": {
                             "&.Mui-focused fieldset": {
@@ -211,178 +256,149 @@ export default function EditProfile() {
                             },
                           },
                         }}
-                      >
-                        {profile.title && (
-                          <MenuItem value={profile.title}>
-                            {profile.title}
-                          </MenuItem>
-                        )}
-                        <MenuItem value={"Ms."}>Ms.</MenuItem>
-                        <MenuItem value={"Mr."}>Mr.</MenuItem>
-                        <MenuItem value={"Dr."}>Dr.</MenuItem>
-                        <MenuItem value={"Prof."}>Prof.</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4.5}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="firstName"
-                      value={profile.firstName}
-                      onChange={handleChange}
-                      label="First Name"
-                      autoComplete="given-name"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "&.Mui-focused fieldset": {
-                            borderColor: "black",
-                          },
-                        },
-                      }}
-                    />
-                  </Grid>
+                      />
+                    </Grid>
 
-                  <Grid item xs={4.5}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="lastName"
-                      label="Last Name"
-                      value={profile.lastName}
-                      onChange={handleChange}
-                      autoComplete="family-name"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "&.Mui-focused fieldset": {
-                            borderColor: "black",
+                    <Grid item xs={4.5}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="lastName"
+                        label="Last Name"
+                        value={profile.lastName}
+                        onChange={handleChange}
+                        autoComplete="family-name"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "&.Mui-focused fieldset": {
+                              borderColor: "black",
+                            },
                           },
-                        },
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="role"
-                      label="Role"
-                      value={profile.role}
-                      onChange={handleChange}
-                      autoComplete="role"
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "&.Mui-focused fieldset": {
-                            borderColor: "black",
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        required
+                        fullWidth
+                        name="role"
+                        label="Role"
+                        value={profile.role}
+                        onChange={handleChange}
+                        autoComplete="role"
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "&.Mui-focused fieldset": {
+                              borderColor: "black",
+                            },
                           },
-                        },
-                      }}
-                    />
+                        }}
+                      />
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
 
-              {/* Profile Image */}
-              <Grid item xs={3}>
-                <Avatar
-                  alt="Profile Image"
-                  src={profileImage || "../assets/profile-photo.webp"}
-                  sx={{
-                    width: 120,
-                    height: 120,
-                    border: "1px solid #838181",
-                    boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.2)",
-                    cursor: "pointer",
-                    "& img": {
-                      objectFit: "fit",
-                    },
-                  }}
-                  onClick={handleProfileImageClick}
-                >
-                  <IconButton
-                    color="primary"
-                    aria-label="upload picture"
-                    component="span"
+                {/* Profile Image */}
+                <Grid item xs={3}>
+                  <Avatar
+                    alt="Profile Image"
+                    src={profileImage || "../assets/profile-photo.webp"}
+                    sx={{
+                      width: 120,
+                      height: 120,
+                      border: "1px solid #838181",
+                      boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.2)",
+                      cursor: "pointer",
+                      "& img": {
+                        objectFit: "fit",
+                      },
+                    }}
+                    onClick={handleProfileImageClick}
                   >
-                    <PhotoCamera />
-                  </IconButton>
-                </Avatar>
-                <input
-                  type="file"
-                  ref={profileImageInputRef}
-                  onChange={handleProfileImageChange}
-                  style={{ display: "none" }}
-                  accept="image/*"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  name="linkedin"
-                  fullWidth
-                  label="LinkedIn URL"
-                  value={profile.linkedin}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  name="biography"
-                  fullWidth
-                  label="Biography"
-                  multiline
-                  rows={4}
-                  value={profile.biography}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  name="currentProjects"
-                  fullWidth
-                  label="Current Projects"
-                  multiline
-                  rows={4}
-                  value={profile.currentProjects}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <InputLabel sx={{ my: 2 }}>Research Interests</InputLabel>
-                <Paper
-                  elevation={2}
-                  sx={{
-                    padding: 2,
-                    maxHeight: 130,
-                    borderStyle: "solid",
-                    borderColor: "#D0D0D0",
-                    maxWidth: 1030,
-                    overflowY: "auto",
-                    mt: 1,
-                    mb: 1,
-                    "&:hover": {
-                      borderColor: "black", // Changes border to black on hover
-                    },
-                  }}
-                >
-                  <FormGroup>
-                    {sdgList.map((sdg) => (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={profile.researchInterests.includes(sdg)}
-                            onChange={(event) => handleSDGChange(event, sdg)}
-                            value={sdg}
-                          />
-                        }
-                        label={sdg}
-                        key={sdg}
-                      />
-                    ))}
-                  </FormGroup>
-                </Paper>
-              </Grid>
+                    <IconButton
+                      color="primary"
+                      aria-label="upload picture"
+                      component="span"
+                    >
+                      <PhotoCamera />
+                    </IconButton>
+                  </Avatar>
+                  <input
+                    type="file"
+                    ref={profileImageInputRef}
+                    onChange={handleProfileImageChange}
+                    style={{ display: "none" }}
+                    accept="image/*"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    name="linkedin"
+                    fullWidth
+                    label="LinkedIn URL"
+                    value={profile.linkedin}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    name="biography"
+                    fullWidth
+                    label="Biography"
+                    multiline
+                    rows={4}
+                    value={profile.biography}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    name="currentProjects"
+                    fullWidth
+                    label="Current Projects"
+                    multiline
+                    rows={4}
+                    value={profile.currentProjects}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <InputLabel sx={{ my: 2 }}>Research Interests</InputLabel>
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      padding: 2,
+                      maxHeight: 130,
+                      borderStyle: "solid",
+                      borderColor: "#D0D0D0",
+                      maxWidth: 1030,
+                      overflowY: "auto",
+                      mt: 1,
+                      mb: 1,
+                      "&:hover": {
+                        borderColor: "black", // Changes border to black on hover
+                      },
+                    }}
+                  >
+                    <FormGroup>
+                      {sdgList.map((sdg) => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={profile.researchInterests.includes(sdg)}
+                              onChange={(event) => handleSDGChange(event, sdg)}
+                              value={sdg}
+                            />
+                          }
+                          label={sdg}
+                          key={sdg}
+                        />
+                      ))}
+                    </FormGroup>
+                  </Paper>
+                </Grid>
 
-              {/* <Grid item xs={12}>
+                {/* <Grid item xs={12}>
               <input
                 accept="image/*"
                 type="file"
@@ -405,21 +421,22 @@ export default function EditProfile() {
                 />
               )}
             </Grid> */}
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={loading || !hasProfileChanged()}
-            >
-              {loading ? "Updating..." : "Update Profile"}
-            </Button>
-          </Box>
-        </Paper>
-      ) : (
-        <Typography></Typography>
-      )}
-    </Container>
+              </Grid>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+                disabled={loading || !hasProfileChanged()}
+              >
+                {loading ? "Updating..." : "Update Profile"}
+              </Button>
+            </Box>
+          </Paper>
+        ) : (
+          <Typography></Typography>
+        )}
+      </Container>
+    </div>
   );
 }

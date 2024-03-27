@@ -7,8 +7,9 @@ import { AuthProvider } from "./contexts/AuthContexts.js";
 import { GoogleAuthProvider } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import "./components/style/Footer.css";
-import { UserProfileProvider } from "./contexts/UserProfileContexts.js";
+
 import Modal from "@mui/material/Modal";
+import { UserProfileProvider } from "./contexts/UserProfileContexts.js";
 
 // Pages imported
 import SearchResults from "./pages/SearchResults.js";
@@ -49,8 +50,8 @@ function App() {
 
   return (
     // Below shows the navigation bar and sets the routes of every page
-
-      <AuthProvider>
+    <AuthProvider>
+      <UserProfileProvider>
         <div>
           <BrowserRouter>
             <div className="app-container">
@@ -79,8 +80,8 @@ function App() {
             </div>
           </BrowserRouter>
         </div>
-      </AuthProvider>
-
+      </UserProfileProvider>
+    </AuthProvider>
   );
 }
 
