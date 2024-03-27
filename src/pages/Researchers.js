@@ -305,6 +305,7 @@ const ProfileInfoPopup = ({
             fontFamily: "Tensor Sans",
             color: "grey",
             // Remove any box-shadow or border that might appear on hover
+            //
             "&:hover": {
               backgroundColor: "transparent",
               boxShadow: "none",
