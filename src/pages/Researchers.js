@@ -10,6 +10,7 @@ import "../components/style/noHover.css";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import emailjs from "emailjs-com";
 import { useAuth } from "../contexts/AuthContexts";
+import Popover from "@mui/material/Popover";
 
 import { useContactStatus } from "../contexts/ContactContext.js";
 import { Typography, Link } from "@mui/material";
@@ -938,6 +939,23 @@ export default function Researchers() {
     }
   };
 
+  const handleOpenFilter = (event) => {
+    setAnchorEl(event.currentTarget);
+    setOpenFilter(true);
+  };
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [selectedFilters, setSelectedFilters] = React.useState([]);
+
+  const handleFilterChange = (event) => {
+    const { name, checked } = event.target;
+    if (checked) {
+      setSelectedSDGs([...selectedSDGs, name]);
+    } else {
+      setSelectedSDGs(selectedSDGs.filter((sdg) => sdg !== name));
+    }
+  };
+
   //filter researchers by search query
   const filteredProfiles = profiles.filter((profile) => {
     const fullName =
@@ -996,9 +1014,9 @@ export default function Researchers() {
   const paperStyle = {
     // marginLeft: "70px",
     //padding: "15px",
-    margin: "15px",
-    marginTop: "10px",
-    marginBottom: "15px",
+    margin: "1.2%",
+
+    marginBottom: "3%",
     display: "flex",
 
     alignItems: "center",
@@ -1042,107 +1060,147 @@ export default function Researchers() {
             }}
           >
             <TextField // Search bar
-              label="Search Researchers..."
+              label="Search Members..."
               variant="outlined"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
-                width: "60vw",
+                width: "70vw",
                 marginTop: "-20px",
-                marginBottom: "40px",
+
+                "& .MuiInputBase-input": {
+                  fontSize: "calc(100rem + 1vw)",
+                },
+              }}
+              InputLabelProps={{
+                style: {
+                  fontSize: "calc(0.2rem + 1vw)",
+
+                  top: "5%", // Position the label in the center vertically
+                  //  transform: "translateY(-50%)", // Adjust the label to be exactly in the middle
+                  marginLeft: "0.5%",
+                },
               }}
               sx={{
-                borderRadius: "20px",
                 "& .MuiOutlinedInput-root": {
-                  borderRadius: "25px",
+                  borderRadius: "25vw",
+                  height: "4vw",
+                  padding: "0 14px",
+                },
+                "& .MuiInputBase-input": {
+                  fontSize: "calc(0.4rem + 1vw)", // Responsive font size for the input
+                  marginLeft: "2%",
                 },
               }}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton>
+                    <IconButton
+                      sx={{
+                        // Adjust icon size similarly if needed, or use a fixed size
+                        "& .MuiSvgIcon-root": {
+                          fontSize: "calc(1rem + 1vw)",
+                        },
+                      }}
+                    >
                       <SearchIcon />
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
             />
+
             <Button
-              onClick={() => setOpenFilter(true)}
+              onClick={handleOpenFilter}
               sx={{
                 marginRight: "30px",
                 fontSize: "1rem",
                 color: "#464646",
                 marginTop: "-70px",
                 "&:hover": {
-                  backgroundColor: "transparent", // Set the background color to transparent on hover
-                  boxShadow: "none", // Remove any box shadow on hover
+                  backgroundColor: "transparent",
+                  boxShadow: "none",
                 },
                 "&:focus": {
-                  backgroundColor: "transparent", // Remove the outline on focus
+                  backgroundColor: "transparent",
                 },
               }}
             >
-              <FilterListIcon sx={{ fontSize: "2rem" }} />
+              <FilterListIcon sx={{ fontSize: "2vw" }} />
             </Button>
-          </div>
-          <Modal
-            open={openFilter}
-            onClose={handleCloseFilter}
-            sx={{
-              //Drop down box for SDG filter
-              display: "flex",
-              justifyContent: "right",
-              alignItems: "center",
-              marginRight: "60px",
-              marginTop: "-20px",
-            }}
-            BackdropProps={{ style: { backgroundColor: "transparent" } }}
-          >
-            <Box
-              sx={{
-                width: 430, // Width of the dropdown
-                maxHeight: 230,
-                overflowY: "auto", // Make it scrollable
-                bgcolor: "background.paper",
-                p: 2,
-                border: "1px solid #c4c4c4",
-                borderRadius: "10px", // Make it rounded
-                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+            <Popover
+              open={openFilter}
+              anchorEl={anchorEl}
+              onClose={handleCloseFilter}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              PaperProps={{
+                sx: {
+                  marginTop: "-3.5%", // Adjust this value to move the popover up
+                },
               }}
             >
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Button
-                  onClick={clearSDGSelection}
-                  sx={{
-                    fontSize: "0.8rem",
-                    marginBottom: "-20px",
-                    marginLeft: 45, // Align the button to the right
-                  }}
-                >
-                  Clear
-                </Button>
-              </Box>
-              <FormGroup>
-                {sdglist.map((sdg) => (
+              <Box
+                sx={{
+                  width: "calc(1rem + 35vw)",
+                  maxHeight: "calc(1rem + 15vw)",
+                  overflowY: "auto",
+                  bgcolor: "background.paper",
+                  p: 2,
+                  border: "1px solid #c4c4c4",
+                  borderRadius: "10px",
+                  boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Button
+                    onClick={clearSDGSelection}
+                    sx={{
+                      fontSize: "0.8vw",
+                      marginBottom: "-20px",
+                      marginLeft: "90%", // Align the button to the right
+                    }}
+                  >
+                    Clear
+                  </Button>
+                </Box>
+                {sdglist.map((sdg, index) => (
                   <FormControlLabel
+                    key={index}
                     control={
                       <Checkbox
+                        name={sdg}
                         checked={selectedSDGs.includes(sdg)}
-                        onChange={handleSDGChange}
-                        value={sdg}
+                        onChange={handleFilterChange}
                       />
                     }
                     label={sdg}
-                    key={sdg}
-                    sx={{ fontSize: "0.8rem" }} // Smaller font size
+                    sx={{
+                      display: "block",
+                      "& .MuiTypography-root": {
+                        // Target the label typography
+                        fontSize: "calc(0.8rem + 0.5vw)", // Dynamic font size based on vw
+                      },
+                    }}
                   />
                 ))}
-              </FormGroup>
-            </Box>
-          </Modal>
+              </Box>
+            </Popover>
+          </div>
         </div>
-        <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
           {filteredProfiles.map((profile, index) => (
             <Paper
               key={index}
@@ -1166,8 +1224,6 @@ export default function Researchers() {
                   boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
                   borderRadius: "50%",
 
-                  // marginTop: "70px",
-
                   marginTop: "20%", // Relative to the parent container
                   width: "50%", // Relative to the parent container
                   height: "75%", // Relative to the parent container
@@ -1184,7 +1240,7 @@ export default function Researchers() {
                     cursor: "pointer",
                     fontWeight: "bold",
                     marginTop: "10%",
-                    fontSize: "1em",
+                    fontSize: "1.5vw",
                   }}
                 >
                   <div style={{ fontWeight: "bold", marginBottom: "5%" }}>
@@ -1195,7 +1251,13 @@ export default function Researchers() {
                   >{`${profile.firstName} ${profile.lastName}`}</div>
                 </div>
 
-                <div style={{ cursor: "pointer", marginBottom: "15%" }}>
+                <div
+                  style={{
+                    cursor: "pointer",
+                    marginBottom: "15%",
+                    fontSize: "1.5vw",
+                  }}
+                >
                   {profile.role}
                 </div>
               </div>
@@ -1219,7 +1281,7 @@ export default function Researchers() {
                     cursor: "pointer",
                     fontFamily: "Tensor Sans",
                     color: "black",
-                    fontSize: "1em",
+                    fontSize: "1.2vw",
 
                     // Remove any box-shadow or border that might appear on hover
                     "&:hover": {
@@ -1272,7 +1334,7 @@ export default function Researchers() {
                     cursor: "pointer",
                     fontFamily: "Tensor Sans",
                     color: "grey",
-                    fontSize: "1em",
+                    fontSize: "1.2vw",
                     // Remove any box-shadow or border that might appear on hover
                     "&:hover": {
                       backgroundColor: "transparent",
