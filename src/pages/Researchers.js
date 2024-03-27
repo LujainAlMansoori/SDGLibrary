@@ -10,6 +10,8 @@ import "../components/style/noHover.css";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import emailjs from "emailjs-com";
 import { useAuth } from "../contexts/AuthContexts";
+
+import { useContactStatus } from "../contexts/ContactContext.js";
 import { Typography, Link } from "@mui/material";
 import Button from "@mui/material/Button";
 import { doc, getDoc } from "firebase/firestore";
@@ -53,6 +55,11 @@ const ProfileInfoPopup = ({
   });
 
   const { currentUser } = useAuth();
+  const { contactDisabled } = useContactStatus();
+  const isContactDisabled =
+    contactDisabled[profile.id] ||
+    emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 >= maxEmails;
+
   const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);
   const [sdgTooltip, setSdgTooltip] = useState({
     show: false,
@@ -160,7 +167,7 @@ const ProfileInfoPopup = ({
     };
     return (
       <div style={{ display: "flex", flexWrap: "wrap" }}>
-        {researchInterests.map((interest, index) => {
+        {sortedInterests.map((interest, index) => {
           const sdgNumber = interest.match(/SDG(\d+)/)[1];
           return (
             <ClickAwayListener onClickAway={hideSdgTooltip} key={index}>
@@ -246,9 +253,12 @@ const ProfileInfoPopup = ({
         X
       </button>
 
-      {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 < maxEmails ? (
+      {/*this is the email icon for the profile pop up */}
+      {!contactDisabled ? (
         <IconButton
-          onClick={(event) => handleContactClick(event, profile)}
+          onClick={(event) =>
+            !isContactDisabled && handleContactClick(event, profile)
+          }
           className="noHoverEffect"
           style={{
             position: "absolute",
@@ -264,6 +274,7 @@ const ProfileInfoPopup = ({
               boxShadow: "none",
             },
           }}
+          disabled={!contactDisabled}
         >
           Contact{" "}
           <EmailOutlinedIcon
@@ -486,7 +497,7 @@ const ProfilePopup = ({
   setShowContactButton,
 }) => {
   //State variables to keep track of the amount of emails sent to another user
-
+  const { disableContact } = useContactStatus();
   const { currentUser } = useAuth();
   const [profileofCurrentUser, setProfileofCurrentUser] = useState(null);
   const senderEmail = profileofCurrentUser?.email; // Email of the current logged-in user
@@ -537,6 +548,9 @@ const ProfilePopup = ({
     e.preventDefault();
 
     if (emailCount >= maxEmails) {
+      console.log(`Disabling contact for profile ID: ${profile.id}`);
+      disableContact(profile.id);
+
       alert(
         "You cannot contact them anymore, you have already sent three emails."
       );
@@ -556,6 +570,8 @@ const ProfilePopup = ({
           const newCount = emailCount + 1;
           setEmailCount(newCount);
           if (newCount >= maxEmails) {
+            disableContact(profile.id);
+            console.log(`Disabling contact for profile ID: ${profile.id}`);
             setErrorMessage({
               text: "You have already contacted them three times. Please wait until they reply.",
               show: true,
@@ -648,7 +664,6 @@ const ProfilePopup = ({
         X
       </button>
       {/* Popup content  */}
-
       <div>
         <Typography
           type="submit"
@@ -775,6 +790,8 @@ const ProfilePopup = ({
 
 export default function Researchers() {
   const location = useLocation();
+
+  const { contactDisabled, disableContact, enableContact } = useContactStatus();
   const [showProfileAlert, setShowProfileAlert] = useState(false);
 
   const navigate = useNavigate();
@@ -907,6 +924,8 @@ export default function Researchers() {
   const handleContactClick = (event, profile) => {
     event.stopPropagation();
     if (emailCounts[profile.id] >= maxEmails) {
+      disableContact(profile.id);
+
       setErrorMessage({
         text: "You have already contacted them three times. You cannot contact them anymore.",
         show: true,
@@ -984,8 +1003,8 @@ export default function Researchers() {
 
     alignItems: "center",
     justifyContent: "space-between",
-    width: "calc(25% - 30px)",
-    height: 400,
+    width: "25vw",
+    height: "auto",
     backgroundColor: "#F8FAFB",
   };
 
@@ -1028,7 +1047,7 @@ export default function Researchers() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
-                width: 900,
+                width: "60vw",
                 marginTop: "-20px",
                 marginBottom: "40px",
               }}
@@ -1123,7 +1142,7 @@ export default function Researchers() {
             </Box>
           </Modal>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", cursor: "pointer" }}>
+        <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
           {filteredProfiles.map((profile, index) => (
             <Paper
               key={index}
@@ -1146,13 +1165,17 @@ export default function Researchers() {
                   border: "0.5px solid #393939",
                   boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
                   borderRadius: "50%",
-                  marginTop: "70px",
 
-                  width: "150px",
-                  height: "150px",
+                  // marginTop: "70px",
+
+                  marginTop: "20%", // Relative to the parent container
+                  width: "50%", // Relative to the parent container
+                  height: "75%", // Relative to the parent container
+                  // width: "15vw",
+                  // height: "15vw",
                 }}
               />
-              <div style={{ textAlign: "center", padding: "10px" }}>
+              <div style={{ textAlign: "center", padding: "5%" }}>
                 <div
                   style={{
                     display: "flex",
@@ -1160,24 +1183,27 @@ export default function Researchers() {
                     alignItems: "center",
                     cursor: "pointer",
                     fontWeight: "bold",
-                    marginTop: "-150px",
-                    fontSize: "18px",
+                    marginTop: "10%",
+                    fontSize: "1em",
                   }}
                 >
-                  <div style={{ fontWeight: "bold", marginBottom: "5px" }}>
+                  <div style={{ fontWeight: "bold", marginBottom: "5%" }}>
                     {profile.title}
                   </div>
                   <div
-                    style={{ marginLeft: "5px", marginBottom: "5px" }}
+                    style={{ marginLeft: "5px", marginBottom: "5%" }}
                   >{`${profile.firstName} ${profile.lastName}`}</div>
                 </div>
 
-                <div style={{ cursor: "pointer" }}>{profile.role}</div>
+                <div style={{ cursor: "pointer", marginBottom: "15%" }}>
+                  {profile.role}
+                </div>
               </div>
 
               {emailCounts[`${currentUser?.uid}_${profile?.id}`] + 1 <=
                 maxEmails && showContactButton[profile.id] !== false ? (
                 <IconButton
+                  disabled={contactDisabled[profile.id]}
                   onClick={(event) => handleContactClick(event, profile)}
                   className="noHoverEffect"
                   sx={{
@@ -1187,13 +1213,14 @@ export default function Researchers() {
                   }}
                   style={{
                     position: "absolute",
-                    top: "10px",
-                    right: "10px",
+                    top: "5%",
+                    right: "5%",
+
                     cursor: "pointer",
                     fontFamily: "Tensor Sans",
                     color: "black",
+                    fontSize: "1em",
 
-                    fontSize: "16px",
                     // Remove any box-shadow or border that might appear on hover
                     "&:hover": {
                       backgroundColor: "transparent",
@@ -1210,8 +1237,9 @@ export default function Researchers() {
                       },
                     }}
                     style={{
+                      fontSize: "1.5em",
                       color: "black",
-                      marginLeft: "5px",
+                      marginLeft: "5%",
                       // Remove any box-shadow or border that might appear on hover
                       "&:hover": {
                         backgroundColor: "transparent",
@@ -1238,14 +1266,18 @@ export default function Researchers() {
                   }}
                   style={{
                     position: "absolute",
-                    top: "10px",
-                    right: "10px",
-                    cursor: "not-allowed",
+                    top: "5%",
+                    right: "5%",
+                    marginBottom: "15%",
+                    cursor: "pointer",
                     fontFamily: "Tensor Sans",
                     color: "grey",
-                    fontSize: "16px",
+                    fontSize: "1em",
+                    // Remove any box-shadow or border that might appear on hover
                     "&:hover": {
                       backgroundColor: "transparent",
+                      boxShadow: "none",
+                      border: "none",
                     },
                   }}
                 >
@@ -1268,10 +1300,14 @@ export default function Researchers() {
                       },
                     }}
                     style={{
+                      fontSize: "1.5em",
                       color: "grey",
-                      marginLeft: "5px",
+                      marginLeft: "5%",
+                      // Remove any box-shadow or border that might appear on hover
                       "&:hover": {
                         backgroundColor: "transparent",
+                        boxShadow: "none",
+                        border: "none",
                       },
                     }}
                   />
