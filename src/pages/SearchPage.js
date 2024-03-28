@@ -304,8 +304,11 @@ function SearchPage() {
             style: {
               fontSize: "calc(0.2rem + 1vw)",
               top: "5%",
-              marginLeft: "0.5%",
+            
               background: "#fff",
+              marginLeft: "0.5%",
+              marginBottom: "1%",
+              padding: "0vw 5vh",
             },
           }}
           sx={{

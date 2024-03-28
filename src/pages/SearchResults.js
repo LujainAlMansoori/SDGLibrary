@@ -220,11 +220,13 @@ export default function SearchResults() {
             }}
             InputLabelProps={{
               style: {
-                fontSize: "calc(0.2rem + 1vw)",
-
+                fontSize: "calc(1.2vw)",
+                background: "#fff",
                 top: "5%", // Position the label in the center vertically
                 //  transform: "translateY(-50%)", // Adjust the label to be exactly in the middle
                 marginLeft: "0.5%",
+                marginBottom: "1%",
+                padding: "0vw 5vh",
               },
             }}
             sx={{

@@ -1069,6 +1069,7 @@ export default function Researchers() {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 width: "70vw",
+
                 marginTop: "-20px",
                 "& .MuiInputBase-input": {
                   fontSize: "calc(100rem + 1vw)",
@@ -1077,10 +1078,14 @@ export default function Researchers() {
               InputLabelProps={{
                 style: {
                   fontSize: "calc(0.2rem + 1vw)",
-                  padding: "1%",
-                  marginRight: "5%",
-                  marginLeft: "1%",
-                  marginTop: "-1.2%",
+                  top: "5%",
+
+                  background: "#fff",
+                  marginLeft: "0.5%",
+                  marginBottom: "1%",
+                  padding: "0vw 5vh",
+
+                  fontSize: "calc(0.2rem + 1vw)",
 
                   backgroundColor: "#fff",
                 },
@@ -1120,7 +1125,7 @@ export default function Researchers() {
                 marginRight: "30px",
                 fontSize: "1rem",
                 color: "#464646",
-                marginTop: "-70px",
+                marginTop: "-2vw",
                 "&:hover": {
                   backgroundColor: "transparent",
                   boxShadow: "none",
@@ -1227,7 +1232,6 @@ export default function Researchers() {
                   border: "0.5px solid #393939",
                   boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
                   borderRadius: "50%",
-                
 
                   marginTop: "20%", // Relative to the parent container
                   width: "50%", // Relative to the parent container
