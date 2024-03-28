@@ -284,6 +284,7 @@ export default function SearchResults() {
                   alt={`SDG ${index + 1}`}
                   style={{
                     // width: "calc((100% / 4) - 90px)",
+                    maxHeight: "20vw",
                     width: "calc((100% / 4) - 4vw)",
                     borderRadius: "5%",
                     cursor: "pointer",

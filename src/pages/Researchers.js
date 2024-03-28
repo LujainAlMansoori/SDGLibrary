@@ -1236,6 +1236,7 @@ export default function Researchers() {
                   marginTop: "20%", // Relative to the parent container
                   width: "50%", // Relative to the parent container
                   height: "75%", // Relative to the parent container
+                  maxHeight: "12vw",
                   // width: "15vw",
                   // height: "15vw",
                 }}
