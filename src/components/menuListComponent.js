@@ -96,7 +96,7 @@ export default function MenuListComposition({ logout, navigate }) {
             color: "black",
             transform: open ? "rotate(180deg)" : "rotate(0deg)",
             transition: "transform 0.3s",
-            fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem", lg: "3rem" },
+            fontSize: "1.6vw",
           }}
         />
       </Button>
@@ -107,15 +107,22 @@ export default function MenuListComposition({ logout, navigate }) {
         placement="bottom-start"
         transition
         style={{
-          zIndex: 2000,
+          zIndex: 10000000,
           width: "auto",
+
           maxHeight: "calc(60vh + 20px)",
           overflow: "auto",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.25)", // Add box shadow
+          borderRadius: "1vw", // Add rounded edges
         }}
       >
         {({ TransitionProps }) => (
           <Grow {...TransitionProps}>
-            <Paper>
+            <Paper
+              sx={{
+                zIndex: 10000000, // Change the background color to red
+              }}
+            >
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList
                   autoFocusItem={open}
@@ -123,8 +130,10 @@ export default function MenuListComposition({ logout, navigate }) {
                   aria-labelledby="composition-button"
                   onKeyDown={handleListKeyDown}
                   sx={{
+                    zindex: "1000000000000 !important",
+                    backgroundColor: "white",
                     "& .MuiMenuItem-root": {
-                      fontSize: "calc(0.8rem + 0.5vw)", // Responsive font size based on viewport width
+                      fontSize: "0.9vw", // Responsive font size based on viewport width
                     },
                   }}
                 >

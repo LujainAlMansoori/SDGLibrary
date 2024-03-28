@@ -111,14 +111,16 @@ function SearchPage() {
         className="popup-container"
         style={{
           position: "fixed",
-          top: 69,
-          right: 0,
-          bottom: 0,
+          top: "8.5vh", // Adjust the top position based on viewport height
+          right: "0", // Adjust the right position based on viewport width
+          bottom: "0", // Adjust the bottom position based on viewport height
+          zIndex: 2,
           width: "75%",
           backgroundColor: "white",
           zIndex: 1000,
           overflowY: "auto",
           border: "1px solid #e0e0e0",
+
           boxShadow:
             "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
         }}
@@ -130,8 +132,8 @@ function SearchPage() {
             top: 20,
             left: 40,
             cursor: "pointer",
-            width: "20px",
-            height: "20px",
+            width: "1.5vw",
+            height: "1.5vw",
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",
@@ -139,7 +141,8 @@ function SearchPage() {
             border: "none",
             backgroundColor: "#f0f0f0",
             color: "black",
-            fontSize: "10px",
+            fontSize: "0.5vw",
+            marginTop: "2vw",
           }}
         >
           X
@@ -159,7 +162,7 @@ function SearchPage() {
           style={{
             position: "absolute",
             top: 20,
-            right: 50,
+            right: "4vw",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -167,99 +170,109 @@ function SearchPage() {
             border: "none",
             backgroundColor: "#a2cbe7",
             color: "black",
-            fontSize: "13px",
-            padding: "5px 10px",
+            fontSize: "0.8vw",
+
+            marginTop: "2vw",
+            padding: "0.5vw 0.8vw",
           }}
         >
           View the Resource{" "}
           <span
             className="material-icons"
-            style={{ fontSize: "12px", marginLeft: "5px" }}
+            style={{ fontSize: "1vw", marginLeft: "5px" }}
           >
             open_in_new
           </span>
         </button>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "flex-start",
-            marginTop: "90px",
-            padding: "0 120px",
-          }}
-        >
-          <img
-            src={material.imageUrl}
-            alt="Material"
-            style={{
-              border: "1px solid #393939",
-              boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
-              width: "210px",
-              height: "250px",
-              marginRight: "40px",
+        <div style={{ marginTop: "9vw", padding: "0 7vw" }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontFamily: "Tensor Sans",
+              marginBottom: "3vw",
+              fontSize: "2vw",
+              color: "#153363",
+              display: "flex",
+              justifyContent: "center",
             }}
-          />
-          <div>
-            <Typography
-              variant="h4"
-              sx={{
-                fontFamily: "Tensor Sans",
-                marginBottom: "20px",
-                marginRight: "90px",
-              }}
-            >
-              {material.title}
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: "Tensor Sans",
-                marginBottom: "20px",
-              }}
-            >
-              <strong>Type:</strong> {material.category}
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: "Tensor Sans",
-                marginBottom: "20px",
-              }}
-            >
-              <strong>Author: </strong>
-              {material.author}
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: "Tensor Sans",
-                marginBottom: "20px",
-              }}
-            >
-              <strong>Publication: </strong>
-              {material.institution}
-            </Typography>
+          >
+            <strong>{material.title}</strong>
+          </Typography>
 
-            <Typography
-              sx={{
-                fontFamily: "Tensor Sans",
-                marginBottom: "20px",
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+            }}
+          >
+            <div>
+              {/* Metadata Typography components for Type, Author, Publication, Date Published */}
+              <Typography
+                sx={{
+                  fontFamily: "Tensor Sans",
+                  marginBottom: "20px",
+                  fontSize: "1.2vw",
+                }}
+              >
+                <strong>Type:</strong> {material.category}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Tensor Sans",
+                  marginBottom: "20px",
+                  fontSize: "1.2vw",
+                }}
+              >
+                <strong>Author: </strong>
+                {material.author}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Tensor Sans",
+                  marginBottom: "20px",
+                  fontSize: "1.2vw",
+                }}
+              >
+                <strong>Publication: </strong>
+                {material.institution}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Tensor Sans",
+                  marginBottom: "20px",
+                  fontSize: "1.2vw",
+                }}
+              >
+                <strong>Date Published: </strong>
+                {formatDate(material.date_published)}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Tensor Sans",
+                  marginBottom: "20px",
+                  marginTop: "20px",
+                  fontSize: "1.2vw",
+                  marginRight: "1vw",
+                }}
+              >
+                <strong>Description:</strong> {material.description}
+              </Typography>
+            </div>
+            <img
+              src={material.imageUrl}
+              alt="Material"
+              style={{
+                boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.3)",
+                width: "20vw",
+                height: "23vw",
+                marginLeft: "2%",
+                marginRight: "-6%",
               }}
-            >
-              <strong>Date Published: </strong>
-              {formatDate(material.date_published)}
-            </Typography>
+            />
           </div>
         </div>
-        <Typography
-          sx={{
-            fontFamily: "Tensor Sans",
-            marginBottom: "20px",
-            marginTop: "20px",
-            marginLeft: "120px",
-            marginRight: "120px",
-          }}
-        >
-          <strong>Description:</strong> {material.description}
-        </Typography>
       </div>
     );
   };
@@ -283,20 +296,43 @@ function SearchPage() {
           onChange={(e) => setSearchInput(e.target.value)}
           onKeyPress={handleKeyPress}
           style={{
-            width: 900,
-            marginTop: "-20px",
-            marginBottom: "40px",
+            width: "70vw",
+            marginTop: "-2%",
+            marginBottom: "3%",
+          }}
+          InputLabelProps={{
+            style: {
+              fontSize: "calc(0.2rem + 1vw)",
+              top: "5%",
+
+              background: "#fff",
+              marginLeft: "0.5%",
+              marginBottom: "1%",
+              padding: "0vw 5vh",
+            },
           }}
           sx={{
-            borderRadius: "20px",
             "& .MuiOutlinedInput-root": {
-              borderRadius: "25px",
+              borderRadius: "25vw",
+              height: "4vw",
+              padding: "0 14px",
+            },
+            "& .MuiInputBase-input": {
+              fontSize: "calc(0.4rem + 1vw)",
+              marginLeft: "2%",
             },
           }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={handleSearch}>
+                <IconButton
+                  sx={{
+                    "& .MuiSvgIcon-root": {
+                      fontSize: "calc(1rem + 1vw)",
+                    },
+                  }}
+                  onClick={handleSearch}
+                >
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
@@ -317,78 +353,113 @@ function SearchPage() {
           </div>
         )}
         {results.map((result, index) => (
-          <Paper
-            key={index}
-            elevation={3}
-            style={{ margin: "10px", padding: "20px" }}
-            onClick={(event) => handleMaterialClick(result, event)}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
           >
-            <Grid item xs={2} style={{ position: "relative" }}>
-              <button
-                onClick={(event) => {
-                  event.stopPropagation(); // Prevent the event from propagating to the Paper component
-                  window.open(result.link, "_blank");
-                }}
-                style={{
-                  position: "absolute",
+            <Paper
+              key={index}
+              elevation={3}
+              style={{
+                margin: "0.7%",
+                padding: "2%",
+                width: "90vw",
+                height: "auto",
+                minHeight: "30vh",
+              }}
+              onClick={(event) => handleMaterialClick(result, event)}
+            >
+              <Grid item xs={2} style={{ position: "relative" }}>
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation(); // Prevent the event from propagating to the Paper component
+                    window.open(result.link, "_blank");
+                  }}
+                  style={{
+                    position: "absolute",
 
-                  right: 30,
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "none",
-                  backgroundColor: "#a2cbe7",
-                  color: "black",
-                  fontSize: "13px",
-                  padding: "5px 10px",
-                }}
-              >
-                View the Resource{" "}
-                <span
-                  className="material-icons"
-                  style={{ fontSize: "12px", marginLeft: "5px" }}
+                    right: 30,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "none",
+                    backgroundColor: "#a2cbe7",
+                    color: "black",
+                    fontSize: "1vw",
+                    boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.3)",
+                    padding: "0.5vw 0.8vw",
+                  }}
                 >
-                  open_in_new
-                </span>
-              </button>
-            </Grid>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={2}>
-                <img
-                  src={result.imageUrl}
-                  alt="Material"
-                  style={{ width: "150px", height: "200px" }}
+                  View the Resource{" "}
+                  <span
+                    className="material-icons"
+                    style={{ fontSize: "1vw", marginLeft: "5px" }}
+                  >
+                    open_in_new
+                  </span>
+                </button>
+              </Grid>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={2}>
+                  <img
+                    src={result.imageUrl}
+                    alt="Material"
+                    style={{
+                      width: "13vw",
+                      height: "17vw",
+
+                      boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.3)",
+                    }}
+                  />
+                </Grid>
+
+                <Grid item xs={8}>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      marginBottom: "5px",
+                      fontSize: "1.6vw",
+                      color: "#153363",
+                    }}
+                  >
+                    <strong>{result.title}</strong>
+                  </Typography>
+
+                  <Typography
+                    variant="body1"
+                    style={{
+                      marginTop: "10px",
+                      marginBottom: "5px",
+                      fontSize: "1.2vw",
+                    }}
+                  >
+                    <strong> Author: </strong>
+                    {result.author}
+                  </Typography>
+
+                  <Typography
+                    variant="body2"
+                    style={{
+                      marginBottom: "5px",
+                      marginRight: "-15vw",
+                      fontSize: "1.1vw",
+                    }}
+                  >
+                    <strong> Description: </strong>
+                    {result.description}
+                  </Typography>
+                </Grid>
+                <link
+                  rel="stylesheet"
+                  href="https://fonts.googleapis.com/icon?family=Material+Icons"
                 />
               </Grid>
-
-              <Grid item xs={8}>
-                <Typography variant="h6" style={{ marginBottom: "5px" }}>
-                  <strong>{result.title}</strong>
-                </Typography>
-
-                <Typography
-                  variant="body1"
-                  style={{ marginTop: "10px", marginBottom: "5px" }}
-                >
-                  <strong> Author: </strong>
-                  {result.author}
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  style={{ marginBottom: "5px", marginRight: "-220px" }}
-                >
-                  <strong> Description: </strong>
-                  {result.description}
-                </Typography>
-              </Grid>
-              <link
-                rel="stylesheet"
-                href="https://fonts.googleapis.com/icon?family=Material+Icons"
-              />
-            </Grid>
-          </Paper>
+            </Paper>
+          </div>
         ))}
       </div>
 

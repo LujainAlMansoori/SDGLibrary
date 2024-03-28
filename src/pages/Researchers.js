@@ -305,6 +305,7 @@ const ProfileInfoPopup = ({
             fontFamily: "Tensor Sans",
             color: "grey",
             // Remove any box-shadow or border that might appear on hover
+            //
             "&:hover": {
               backgroundColor: "transparent",
               boxShadow: "none",
@@ -1068,8 +1069,8 @@ export default function Researchers() {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 width: "70vw",
-                marginTop: "-20px",
 
+                marginTop: "-20px",
                 "& .MuiInputBase-input": {
                   fontSize: "calc(100rem + 1vw)",
                 },
@@ -1077,10 +1078,16 @@ export default function Researchers() {
               InputLabelProps={{
                 style: {
                   fontSize: "calc(0.2rem + 1vw)",
+                  top: "5%",
 
-                  top: "5%", // Position the label in the center vertically
-                  //  transform: "translateY(-50%)", // Adjust the label to be exactly in the middle
+                  background: "#fff",
                   marginLeft: "0.5%",
+                  marginBottom: "1%",
+                  padding: "0vw 5vh",
+
+                  fontSize: "calc(0.2rem + 1vw)",
+
+                  backgroundColor: "#fff",
                 },
               }}
               sx={{
@@ -1118,7 +1125,7 @@ export default function Researchers() {
                 marginRight: "30px",
                 fontSize: "1rem",
                 color: "#464646",
-                marginTop: "-70px",
+                marginTop: "-2vw",
                 "&:hover": {
                   backgroundColor: "transparent",
                   boxShadow: "none",
@@ -1229,6 +1236,7 @@ export default function Researchers() {
                   marginTop: "20%", // Relative to the parent container
                   width: "50%", // Relative to the parent container
                   height: "75%", // Relative to the parent container
+                  maxHeight: "12vw",
                   // width: "15vw",
                   // height: "15vw",
                 }}
@@ -1242,14 +1250,24 @@ export default function Researchers() {
                     cursor: "pointer",
                     fontWeight: "bold",
                     marginTop: "10%",
-                    fontSize: "1.5vw",
+                    fontSize: "1.8vw",
                   }}
                 >
-                  <div style={{ fontWeight: "bold", marginBottom: "5%" }}>
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      marginBottom: "5%",
+                      color: "#153363",
+                    }}
+                  >
                     {profile.title}
                   </div>
                   <div
-                    style={{ marginLeft: "5px", marginBottom: "5%" }}
+                    style={{
+                      marginLeft: "5px",
+                      marginBottom: "5%",
+                      color: "#153363",
+                    }}
                   >{`${profile.firstName} ${profile.lastName}`}</div>
                 </div>
 
