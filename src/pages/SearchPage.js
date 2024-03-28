@@ -320,6 +320,7 @@ function SearchPage() {
             "& .MuiInputBase-input": {
               fontSize: "calc(0.4rem + 1vw)",
               marginLeft: "2%",
+              overflow: "hidden", // Prevents text from overflowing
             },
           }}
           InputProps={{
@@ -327,9 +328,7 @@ function SearchPage() {
               <InputAdornment position="end">
                 <IconButton
                   sx={{
-                    "& .MuiSvgIcon-root": {
-                      fontSize: "calc(1rem + 1vw)",
-                    },
+                    maxWidth: "100%", // Ensure the icon respects the boundaries of its container
                   }}
                   onClick={handleSearch}
                 >

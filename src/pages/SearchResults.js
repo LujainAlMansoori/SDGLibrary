@@ -212,18 +212,14 @@ export default function SearchResults() {
             onKeyPress={handleKeyPress}
             style={{
               width: "70vw",
-              marginTop: "-20px",
-
-              "& .MuiInputBase-input": {
-                fontSize: "calc(100rem + 1vw)",
-              },
+              marginTop: "-2%",
+              marginBottom: "3%",
             }}
             InputLabelProps={{
               style: {
-                fontSize: "calc(1.2vw)",
+                fontSize: "calc(0.2rem + 1vw)",
+                top: "5%",
                 background: "#fff",
-                top: "5%", // Position the label in the center vertically
-                //  transform: "translateY(-50%)", // Adjust the label to be exactly in the middle
                 marginLeft: "0.5%",
                 marginBottom: "1%",
                 padding: "0vw 5vh",
@@ -231,26 +227,29 @@ export default function SearchResults() {
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
-                borderRadius: "25vw",
-                height: "4vw",
-                padding: "0 14px",
+                borderRadius: "25vw", // Use px for consistency across zoom levels
+                height: "auto", // Allow height to adjust based on content and zoom level
+                padding: "0 14px", // Maintain padding for inner content
+                "& .MuiSvgIcon-root": {
+                  fontSize: "calc(1rem + 1vw)", // Ensure the icon scales appropriately
+                },
               },
               "& .MuiInputBase-input": {
-                fontSize: "calc(0.4rem + 1vw)", // Responsive font size for the input
+                fontSize: "calc(0.4rem + 1vw)",
                 marginLeft: "2%",
+                overflow: "hidden", // Ensures text doesn't overflow the search bar boundaries
               },
             }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
+                    onClick={handleSearch}
                     sx={{
-                      // Adjust icon size similarly if needed, or use a fixed size
                       "& .MuiSvgIcon-root": {
-                        fontSize: "calc(1rem + 1vw)",
+                        fontSize: "calc(1rem + 1vw)", // Adjust icon size responsively
                       },
                     }}
-                    onClick={handleSearch}
                   >
                     <SearchIcon />
                   </IconButton>
