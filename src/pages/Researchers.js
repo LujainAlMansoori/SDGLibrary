@@ -1134,6 +1134,7 @@ export default function Researchers() {
               anchorEl={anchorEl}
               onClose={handleCloseFilter}
               anchorOrigin={{
+                //
                 vertical: "bottom",
                 horizontal: "right",
               }}
