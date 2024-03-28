@@ -1069,35 +1069,28 @@ export default function Researchers() {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 width: "70vw",
-
                 marginTop: "-20px",
-                "& .MuiInputBase-input": {
-                  fontSize: "calc(100rem + 1vw)",
-                },
               }}
               InputLabelProps={{
                 style: {
                   fontSize: "calc(0.2rem + 1vw)",
                   top: "5%",
-
                   background: "#fff",
                   marginLeft: "0.5%",
                   marginBottom: "1%",
                   padding: "0vw 5vh",
-
-                  fontSize: "calc(0.2rem + 1vw)",
-
                   backgroundColor: "#fff",
                 },
               }}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: "25vw",
-                  height: "4vw",
+                  height: "auto",
                   padding: "0 14px",
                 },
                 "& .MuiInputBase-input": {
-                  fontSize: "calc(0.4rem + 1vw)", // Responsive font size for the input
+                  fontSize: "calc(0.4rem + 1vw)",
+                  overflow: "hidden",
                   marginLeft: "2%",
                 },
               }}
@@ -1106,7 +1099,6 @@ export default function Researchers() {
                   <InputAdornment position="end">
                     <IconButton
                       sx={{
-                        // Adjust icon size similarly if needed, or use a fixed size
                         "& .MuiSvgIcon-root": {
                           fontSize: "calc(1rem + 1vw)",
                         },
@@ -1122,7 +1114,7 @@ export default function Researchers() {
             <Button
               onClick={handleOpenFilter}
               sx={{
-                marginRight: "30px",
+                marginRight: "1vw",
                 fontSize: "1rem",
                 color: "#464646",
                 marginTop: "-2vw",
