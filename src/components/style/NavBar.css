@@ -9,7 +9,7 @@ html, body {
     display: flex; 
     align-items: center;
     justify-content: space-between;
-    z-index: 1000000;
+    z-index: 1000000 !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     font-family: 'Tenor Sans', sans-serif;
     padding: 2vh 4vw;
@@ -52,12 +52,12 @@ html, body {
 }
 
 .navBar a {
-    font-size: calc(0.8rem + 0.5vw);
+    font-size: calc(1.2vw);
 
 }
 
 .navBar span {
-    font-size: calc(0.8rem + 0.5vw); 
+    font-size: calc(1.2vw);
 
 }
 

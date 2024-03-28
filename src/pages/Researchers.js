@@ -1055,7 +1055,9 @@ export default function Researchers() {
 
           <div
             style={{
-              marginBottom: "60px",
+              marginTop: "-1%",
+              marginBottom: "4%",
+
               display: "flex",
               justifyContent: "center",
             }}
@@ -1225,6 +1227,7 @@ export default function Researchers() {
                   border: "0.5px solid #393939",
                   boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.3)",
                   borderRadius: "50%",
+                
 
                   marginTop: "20%", // Relative to the parent container
                   width: "50%", // Relative to the parent container
@@ -1242,14 +1245,24 @@ export default function Researchers() {
                     cursor: "pointer",
                     fontWeight: "bold",
                     marginTop: "10%",
-                    fontSize: "1.5vw",
+                    fontSize: "1.8vw",
                   }}
                 >
-                  <div style={{ fontWeight: "bold", marginBottom: "5%" }}>
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      marginBottom: "5%",
+                      color: "#153363",
+                    }}
+                  >
                     {profile.title}
                   </div>
                   <div
-                    style={{ marginLeft: "5px", marginBottom: "5%" }}
+                    style={{
+                      marginLeft: "5px",
+                      marginBottom: "5%",
+                      color: "#153363",
+                    }}
                   >{`${profile.firstName} ${profile.lastName}`}</div>
                 </div>
 
