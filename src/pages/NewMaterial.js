@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { collection, addDoc } from "firebase/firestore";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import {
   ref as storageRef,
   uploadBytes,
@@ -7,7 +8,7 @@ import {
 } from "firebase/storage";
 // import { PDFDocument } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
-
+import "../components/style/titles.css";
 import db, { storage } from "../firebase";
 import Chip from "@mui/material/Chip";
 import Container from "@mui/material/Container";
@@ -96,7 +97,7 @@ export default function NewMaterial() {
   };
 
   const sdgMapping = sdglist.reduce((acc, item) => {
-    const [code, description] = item.split(' - ');
+    const [code, description] = item.split(" - ");
     acc[code.replace("SDG", "SDG ").trim()] = item; // Ensure format like "SDG 1" matches "SDG1"
     return acc;
   }, {});
@@ -207,8 +208,7 @@ export default function NewMaterial() {
       setTagInput(""); // Clear input field
     } else if (name === "tags") {
       //do nothing
-    }
-    else {
+    } else {
       setMaterialDetails({
         ...materialDetails,
         [name]: value,
@@ -325,17 +325,25 @@ export default function NewMaterial() {
       <Paper
         elevation={4}
         sx={{
-          mt: 7,
+          mt: "8vw",
           backgroundColor: "white",
-          width: 700,
-          marginLeft: "23%",
-          mb: 4,
-          padding: 2,
+          width: "50vw",
+          padding: "2%",
+          marginLeft: { sm: "23%" },
+          marginBottom: "5vw",
+
           justifyContent: "center",
           alignItems: "center",
         }}
       >
-        <Container component="main" maxWidth="sm">
+        <Container
+          component="main"
+          sx={
+            {
+              // maxWidth: { xs: "100%", sm: "90%", md: "80%", lg: "70%" }, // Adjust the maxWidth based on screen size
+            }
+          }
+        >
           <Box
             sx={{
               display: "flex",
@@ -343,16 +351,38 @@ export default function NewMaterial() {
               alignItems: "center",
             }}
           >
-            <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-              New Material
-            </Typography>
+            <h2 className="forms-title">Add Material to the SDGLibrary</h2>
             <Box
               component="form"
               noValidate
               onSubmit={handleSubmit}
-              sx={{ mt: 1 }}
+              sx={{
+                position: "relative", // Ensure a positioning context
+                zIndex: "0", // High z-index to be on top of other elements
+
+                "& .MuiInputLabel-root": {
+                  fontSize: "1vw", // Adjust the label font size and scale with viewport width
+                  background: "#fff",
+
+                  "&.Mui-focused": {
+                    transform: "translate(1vw, -0.8vw) scale(0.75)", // Move the label more to the top
+                  },
+                },
+                "& .MuiInputBase-input": {
+                  paddingTop: "0.7vw",
+                },
+
+                "& .MuiSelect-select": {
+                  paddingTop: "1.2vw", // Adjust the top padding to move the input down
+                  marginBottom: "-0.5vw",
+                },
+
+                "& .MuiIconButton-root": {
+                  fontSize: "2vw", // Increase the font size of the arrow in Select
+                },
+              }}
             >
-              <Grid container spacing={2}>
+              <Grid container spacing={"1vw"}>
                 <Grid item xs={12}>
                   <TextField
                     required
@@ -361,9 +391,13 @@ export default function NewMaterial() {
                     label="Title"
                     value={materialDetails.title}
                     onChange={handleChange}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                      },
+                    }}
                   />
                 </Grid>
-                {/* Category field */}
                 <Grid item xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel id="category-label">Category</InputLabel>
@@ -373,7 +407,27 @@ export default function NewMaterial() {
                       name="category"
                       value={materialDetails.category}
                       label="Category"
+                      sx={{
+                        "& .MuiInputBase-input": {
+                          fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                        },
+                      }}
                       onChange={handleChange}
+                      IconComponent={(props) => (
+                        <ArrowDropDownIcon
+                          {...props}
+                          sx={{ fontSize: "2vw" }}
+                        />
+                      )}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            "& .MuiMenuItem-root": {
+                              fontSize: "1vw", // Match the font size of the label
+                            },
+                          },
+                        },
+                      }}
                     >
                       <MenuItem value="Journal">Journal</MenuItem>
                       <MenuItem value="Research Paper">Research Paper</MenuItem>
@@ -392,35 +446,45 @@ export default function NewMaterial() {
                     fullWidth
                     name="author"
                     label="Author"
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                      },
+                    }}
                     value={materialDetails.author}
                     onChange={handleChange}
                   />
                 </Grid>
-
-                {/* Institution field */}
                 <Grid item xs={12}>
                   <TextField
                     required
                     fullWidth
                     name="institution"
                     label="Institution"
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                      },
+                    }}
                     value={materialDetails.institution}
                     onChange={handleChange}
                   />
                 </Grid>
-
-                {/* Publisher field */}
                 <Grid item xs={12}>
                   <TextField
                     required
                     fullWidth
                     name="publisher"
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                      },
+                    }}
                     label="Publisher"
                     value={materialDetails.publisher}
                     onChange={handleChange}
                   />
                 </Grid>
-                {/* Journal Name field */}
                 {materialDetails.category === "Journal" && (
                   <Grid item xs={12}>
                     <TextField
@@ -428,22 +492,38 @@ export default function NewMaterial() {
                       fullWidth
                       name="journalName"
                       label="Journal Name"
+                      sx={{
+                        "& .MuiInputBase-input": {
+                          fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                        },
+                      }}
                       value={materialDetails.journalName}
                       onChange={handleChange}
                     />
                   </Grid>
                 )}
-
                 <Grid item xs={12}>
                   <TextField
                     required
                     fullWidth
                     name="date_published"
                     label="Date Published"
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        marginTop: "0.5vw",
+
+                        fontSize: "0.8vw", // Adjust the base font size and scale with viewport width
+                      },
+                    }}
                     type="date"
-                    InputLabelProps={{ shrink: true }}
                     value={materialDetails.date_published}
                     onChange={handleChange}
+                    InputLabelProps={{
+                      shrink: true,
+                      "& .MuiIconButton-root": {
+                        fontSize: "32vw !important", // THIS IS NOT WORKING FIX IT, I WANT THIS TO BE A DIFFERENT DONTSIZE THAN THE OTHER
+                      },
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -454,6 +534,11 @@ export default function NewMaterial() {
                     rows={4}
                     name="description"
                     label="Description"
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                      },
+                    }}
                     value={materialDetails.description}
                     onChange={handleChange}
                   />
@@ -464,23 +549,32 @@ export default function NewMaterial() {
                     fullWidth
                     name="link"
                     label="Link"
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                      },
+                    }}
                     value={materialDetails.link}
                     onChange={handleChange}
                     error={Boolean(linkError)}
                     helperText={linkError}
                   />
                 </Grid>
-                {/* Upload File field */}
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
                     type="text"
                     value={materialDetails.fileName || "Upload File"}
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                      },
+                    }}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
                           <IconButton color="primary" component="label">
-                            <CloudUploadIcon />
+                            <CloudUploadIcon style={{ fontSize: "1.3vw" }} />
                             <input
                               type="file"
                               name="file_upload"
@@ -499,6 +593,11 @@ export default function NewMaterial() {
                   <TextField
                     fullWidth
                     name="tags"
+                    sx={{
+                      "& .MuiInputBase-input": {
+                        fontSize: "1vw", // Adjust the base font size and scale with viewport width
+                      },
+                    }}
                     label="Press Enter to Add Tags"
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
@@ -510,14 +609,26 @@ export default function NewMaterial() {
                       justifyContent: "center",
                       flexWrap: "wrap",
                       listStyle: "none",
-                      p: 0.5,
+                      p: 2,
+
                       m: 0,
                     }}
                     component="ul"
                   >
                     {materialDetails.tags.map((tag, index) => (
                       <ListItem key={index}>
-                        <Chip label={tag} onDelete={handleDeleteTag(tag)} />
+                        <Chip
+                          label={tag}
+                          onDelete={handleDeleteTag(tag)}
+                          sx={{
+                            // Adjust the font size of the label
+                            "& .MuiChip-label": { fontSize: "1.2vw" },
+
+                            height: "auto",
+                            padding: "0.1vw 0.4vw",
+                            borderRadius: "0.6vw",
+                          }}
+                        />
                       </ListItem>
                     ))}
                   </Paper>
@@ -527,7 +638,7 @@ export default function NewMaterial() {
                     type="submit"
                     fullWidth
                     variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
+                    sx={{ mt: 3, mb: 2, fontSize: "1vw" }}
                     disabled={
                       !isFormValid() || isLoadingTags || isProcessingTags
                     }

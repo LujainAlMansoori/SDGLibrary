@@ -304,7 +304,7 @@ function SearchPage() {
             style: {
               fontSize: "calc(0.2rem + 1vw)",
               top: "5%",
-            
+
               background: "#fff",
               marginLeft: "0.5%",
               marginBottom: "1%",

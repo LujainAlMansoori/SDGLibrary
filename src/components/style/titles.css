@@ -21,3 +21,32 @@
   
   }
 }
+
+.forms-title {
+  font-size: 3vw;
+  font-weight: bold;
+  margin-top: 6%;
+  margin-bottom:5%;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Tenor Sans', sans-serif;
+  color: #153363;
+  text-align: center; /* Center text horizontally */
+  display: flex;
+  flex-direction: column; /* Stack flex items vertically */
+  justify-content: center; /* Center flex items vertically */
+  align-items: center; /* Center flex items horizontally */
+  font-family: 'Tenor Sans', sans-serif;
+  color: #153363;
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 600px) {
+  .forms-title {
+    font-size: 10vw; /* Increase the relative size on smaller screens */
+  
+  }
+}
+
